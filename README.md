@@ -1,3 +1,6 @@
+This project is forked from Sphero ROS.
+BB-8 driver (from https://github.com/jchadwhite/SpheroBB8-python) is used in creating ROS node support.
+
 sphero_ros
 ==========
 
