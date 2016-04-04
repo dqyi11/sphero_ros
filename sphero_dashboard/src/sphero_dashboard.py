@@ -15,19 +15,17 @@ class LEDWidget(QtGui.QLabel):
         self.setAutoFillBackground(True)
         self.setBackgroundRole(QtGui.QPalette.Base)
 
-    def setRGB(r, g, b):
+    def setRGB(self, r, g, b):
         self.rgb = [r,g,b]
+        p = QtGui.QPalette()
+        p.setColor(self.backgroundRole(), QtGui.QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
+        self.setPalette(p)
         self.update()
   
     def paintEvent(self, e):
-        super(MapViewer, self).paintEvent(e)
+        super(QtGui.QLabel, self).paintEvent(e)
         #qp = QtGui.QPainter()
         #qp.begin(self)
-
-        p = palette()
-        p.setColor(self.backgroundRole(), Qt.QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
-        self.setPalette(p)
-
         #qp.end()         
 
 class LEDConfig(QtGui.QWidget):
@@ -47,6 +45,7 @@ class LEDConfig(QtGui.QWidget):
         self.r_sl.setValue(self.parentWindow.ledRVal)
         self.r_sl.setTickPosition(QtGui.QSlider.TicksBelow)
         self.r_sl.setTickInterval(1)
+        self.r_sl.valueChanged.connect(self.valuechange)
 
         self.g_label = QtGui.QLabel("G")
         self.g_sl = QtGui.QSlider(QtCore.Qt.Horizontal)
@@ -55,6 +54,7 @@ class LEDConfig(QtGui.QWidget):
         self.g_sl.setValue(self.parentWindow.ledGVal)
         self.g_sl.setTickPosition(QtGui.QSlider.TicksBelow)
         self.g_sl.setTickInterval(1)
+        self.g_sl.valueChanged.connect(self.valuechange)
 
         self.b_label = QtGui.QLabel("B")
         self.b_sl = QtGui.QSlider(QtCore.Qt.Horizontal)
@@ -63,6 +63,7 @@ class LEDConfig(QtGui.QWidget):
         self.b_sl.setValue(self.parentWindow.ledBVal)
         self.b_sl.setTickPosition(QtGui.QSlider.TicksBelow)
         self.b_sl.setTickInterval(1)
+        self.b_sl.valueChanged.connect(self.valuechange)
 
         self.led = LEDWidget([20,20],
                              [self.parentWindow.ledRVal,
@@ -74,18 +75,25 @@ class LEDConfig(QtGui.QWidget):
         self.btnOK.clicked.connect(self.update)
         self.btnCancel.clicked.connect(self.cancel)
 
-        self.grid = QtGui.QGridLayout()
-        self.grid.setSpacing(10)
-        self.grid.addWidget(self.led, 0, 1)
-        self.grid.addWidget(self.r_label, 1, 0)
-        self.grid.addWidget(self.r_sl, 1, 1)
-        self.grid.addWidget(self.g_label, 2, 0)
-        self.grid.addWidget(self.g_sl, 2, 1)
-        self.grid.addWidget(self.b_label, 3, 0)
-        self.grid.addWidget(self.b_sl, 3, 1)
-        self.grid.addWidget(self.btnOK, 4, 0)
-        self.grid.addWidget(self.btnCancel, 4, 1)
-        self.setLayout(self.grid)
+        layout = QtGui.QVBoxLayout()
+        layout.addWidget(self.led)
+        r_layout = QtGui.QHBoxLayout()
+        r_layout.addWidget(self.r_label)
+        r_layout.addWidget(self.r_sl)
+        layout.addLayout(r_layout)
+        g_layout = QtGui.QHBoxLayout()
+        g_layout.addWidget(self.g_label)
+        g_layout.addWidget(self.g_sl)
+        layout.addLayout(g_layout)
+        b_layout = QtGui.QHBoxLayout()
+        b_layout.addWidget(self.b_label)
+        b_layout.addWidget(self.b_sl)
+        layout.addLayout(b_layout)
+        btn_layout = QtGui.QHBoxLayout()
+        btn_layout.addWidget(self.btnOK)
+        btn_layout.addWidget(self.btnCancel)
+        layout.addLayout(btn_layout)
+        self.setLayout(layout)
         
         self.show()
 
@@ -97,6 +105,9 @@ class LEDConfig(QtGui.QWidget):
         self.parentWindow.setLED(self.parentWindow.ledRVal,
                                  self.parentWindow.ledGVal,
                                  self.parentWindow.ledBVal)
+        self.led.setRGB(self.parentWindow.ledRVal,
+                        self.parentWindow.ledGVal,
+                        self.parentWindow.ledBVal)
         self.hide()
         
     def cancel(self):
@@ -104,6 +115,12 @@ class LEDConfig(QtGui.QWidget):
         self.g_sl.setValue(self.parentWindow.ledGVal)
         self.b_sl.setValue(self.parentWindow.ledBVal)
         self.hide()
+
+    def valuechange(self):
+        self.led.setRGB(self.r_sl.value(),
+                        self.g_sl.value(),
+                        self.b_sl.value())
+        self.led.update()
 
 class SpheroDashboardForm(QtGui.QMainWindow):
     
@@ -119,10 +136,10 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         self.initUI()
 
         rospy.init_node('sphero_dashboard', anonymous=True)
-        self.cmdVelPub = rospy.Publisher('cmd_vel', Twist)
+        self.cmdVelPub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
         self.cmdVelSub = rospy.Subscriber("cmd_vel", Twist, self.cmdVelCallback)
       
-        self.ledPub = rospy.Publisher('set_color', ColorRGBA)
+        self.ledPub = rospy.Publisher('set_color', ColorRGBA, queue_size=1)
 
         
     def initUI(self):
