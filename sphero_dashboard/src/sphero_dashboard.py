@@ -122,12 +122,47 @@ class LEDConfig(QtGui.QWidget):
                         self.b_sl.value())
         self.led.update()
 
+class DashboardWidget(QtGui.QWidget):
+
+    def __init__(self):
+        super(QtGui.QWidget, self).__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.cmdVelLabel = QtGui.QLabel("cmd_vel")
+        self.cmdVelTextbox = QtGui.QTextEdit()
+        self.cmdVelTextbox.setReadOnly(True)   
+        self.keyEventLabel = QtGui.QLabel("Key")
+        self.keyEventTextbox = QtGui.QTextEdit()
+        self.keyEventTextbox.setReadOnly(True)
+
+        layout = QtGui.QVBoxLayout()
+        layout.addWidget(self.cmdVelLabel)
+        layout.addWidget(self.cmdVelTextbox)
+        layout.addWidget(self.keyEventLabel)
+        layout.addWidget(self.keyEventTextbox)
+        self.setLayout(layout)
+        self.show()
+
+    def handleCmdVelMsg(self, cmd_vel_text):
+        self.cmdVelTextbox.moveCursor(QtGui.QTextCursor.End)
+        self.cmdVelTextbox.ensureCursorVisible()
+        self.cmdVelTextbox.insertPlainText(cmd_vel_text+"\n")
+        self.cmdVelTextbox.update()
+
+    def handleKeyText(self, key_text):
+        self.keyEventTextbox.moveCursor(QtGui.QTextCursor.End)
+        self.keyEventTextbox.ensureCursorVisible()
+        self.keyEventTextbox.insertPlainText(key_text+"\n")
+        self.keyEventTextbox.update()
+
 class SpheroDashboardForm(QtGui.QMainWindow):
     
     def __init__(self):
         super(QtGui.QMainWindow, self).__init__()
         self.resize(600, 480)
-        
+        print "init"        
+
         self.ledRVal = 255
         self.ledGVal = 255
         self.ledBVal = 255
@@ -151,45 +186,87 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         ledMenu = menubar.addMenu('&LED')
         ledMenu.addAction(ledAction)        
 
-        self.cmdVelLabel = QtGui.QLabel("cmd_vel")
-        self.cmdVelTextbox = QtGui.QTextEdit()
-        self.cmdVelTextbox.setReadOnly(True)        
+        self.dashboard = DashboardWidget()
+        self.setCentralWidget(self.dashboard)
 
-        layout = QtGui.QVBoxLayout()
-        layout.addWidget(self.cmdVelLabel)
-        layout.addWidget(self.cmdVelTextbox)
-        self.setLayout(layout)
         self.setWindowTitle("Sphero dashboard")
-
         self.show()
 
     def showLedConfig(self):
         self.ledConfig.show()     
 
     def setLED(self, r, g, b):
-        pass   
-
-    def handleCmdVelMsg(self, text, stdout):
-        self.cmdVelTextbox.moveCursor(QtGui.QTextCursor.End)
-        self.cmdVelTextbox.ensureCursorVisible()
-        self.cmdVelTextbox.insertPlainText(text)
+        color = ColorRGBA(float(r)/255.0, float(g)/255.0, float(b)/255.0, 1.0)
+        self.ledPub.publish(color)
 
     def cmdVelCallback(self, msg):
-        pass
+        msg_text = "x=" + str(msg.linear.x) + " y=" + str(msg.linear.y)
+        self.dashboard.handleCmdVelMsg(msg_text)
 
-        
-    def keyPressEvent(self, e):        
-        if e.key() == QtCore.Qt.Key_Left:
+    def processDirectionKey(self, key):
+        key_text = ""
+        if key == 0:
+            # left
+            key_text = "LEFT"
+            cv = Twist()
+            cv.linear.x = 20.0
+            cv.linear.y = 0.0
+            cv.linear.z = 0.0
+            cv.angular.x = 0.0
+            cv.angular.y = 0.0
+            cv.angular.z = 0.0
+            self.cmdVelPub.publish(cv)
+        elif key == 1:
+            # up
+            key_text = "UP"
+            cv = Twist()
+            cv.linear.x = 0.0
+            cv.linear.y = 20.0
+            cv.linear.z = 0.0
+            cv.angular.x = 0.0
+            cv.angular.y = 0.0
+            cv.angular.z = 0.0
+            self.cmdVelPub.publish(cv)
+        elif key == 2:
+            # right
+            key_text = "RIGHT"
+            cv = Twist()
+            cv.linear.x = -20.0
+            cv.linear.y = 0.0
+            cv.linear.z = 0.0
+            cv.angular.x = 0.0
+            cv.angular.y = 0.0
+            cv.angular.z = 0.0
+            self.cmdVelPub.publish(cv)
+        elif key == 3:
+            # down
+            key_text = "DOWN"
+            cv = Twist()
+            cv.linear.x = 0.0
+            cv.linear.y = -20.0
+            cv.linear.z = 0.0
+            cv.angular.x = 0.0
+            cv.angular.y = 0.0
+            cv.angular.z = 0.0
+            self.cmdVelPub.publish(cv)
+
+        if key_text != "":
+            self.dashboard.handleKeyText(key_text)
+
+    def keyPressEvent(self, e):    
+        print "key press " + str(e.key())     
+        if e.key() == QtCore.Qt.Key_L:
             print "letf"
-
-        elif e.key() == QtCore.Qt.Key_Right:
-            print "right"   
-        
-        elif e.key() == QtCore.Qt.Key_Up:
+            self.processDirectionKey(0)
+        elif e.key() == QtCore.Qt.Key_R:
+            print "right"
+            self.processDirectionKey(2)        
+        elif e.key() == QtCore.Qt.Key_U:
             print "up"
- 
-        elif e.key() == QtCore.Qt.Key_Down:
+            self.processDirectionKey(1)
+        elif e.key() == QtCore.Qt.Key_D:
             print "down"
+            self.processDirectionKey(3)
 
         
 
@@ -197,6 +274,7 @@ if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
     w = SpheroDashboardForm()
+    w.show()
     sys.exit(app.exec_())
   
         
