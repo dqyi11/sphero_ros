@@ -20,4 +20,5 @@ The connection is through BLUETOOTH LE
 
       hcitool dev
       hcitool (-i hci1) lescan
+      hciconfig hci0 up/down
 
