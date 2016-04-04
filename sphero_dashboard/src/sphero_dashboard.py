@@ -38,6 +38,14 @@ class LEDConfig(QtGui.QWidget):
     
     def initUI(self):   
 
+        self.bk_label = QtGui.QLabel("back LED")
+        self.bk_sl = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.bk_sl.setMinimum(0)
+        self.bk_sl.setMaximum(255)
+        self.bk_sl.setValue(self.parentWindow.backLEDVal)
+        self.bk_sl.setTickPosition(QtGui.QSlider.TicksBelow)
+        self.bk_sl.setTickInterval(1)
+
         self.r_label = QtGui.QLabel("R")
         self.r_sl = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.r_sl.setMinimum(0)
@@ -70,9 +78,11 @@ class LEDConfig(QtGui.QWidget):
                               self.parentWindow.ledGVal,
                               self.parentWindow.ledBVal])
         
+        self.btnUpdate = QtGui.QPushButton("Update")
         self.btnOK = QtGui.QPushButton("OK")
         self.btnCancel = QtGui.QPushButton("Cancel")
-        self.btnOK.clicked.connect(self.update)
+        self.btnUpdate.clicked.connect(self.updateConfig)
+        self.btnOK.clicked.connect(self.ok)
         self.btnCancel.clicked.connect(self.cancel)
 
         layout = QtGui.QVBoxLayout()
@@ -89,7 +99,12 @@ class LEDConfig(QtGui.QWidget):
         b_layout.addWidget(self.b_label)
         b_layout.addWidget(self.b_sl)
         layout.addLayout(b_layout)
+        bk_layout = QtGui.QHBoxLayout()
+        bk_layout.addWidget(self.bk_label)
+        bk_layout.addWidget(self.bk_sl)
+        layout.addLayout(bk_layout)
         btn_layout = QtGui.QHBoxLayout()
+        btn_layout.addWidget(self.btnUpdate)
         btn_layout.addWidget(self.btnOK)
         btn_layout.addWidget(self.btnCancel)
         layout.addLayout(btn_layout)
@@ -97,17 +112,24 @@ class LEDConfig(QtGui.QWidget):
         
         self.show()
 
-    def update(self):
+    def updateConfig(self):
         
         self.parentWindow.ledRVal = self.r_sl.value()
         self.parentWindow.ledGVal = self.g_sl.value()
         self.parentWindow.ledBVal = self.b_sl.value()        
-        self.parentWindow.setLED(self.parentWindow.ledRVal,
+        self.parentWindow.setLEDColor(self.parentWindow.ledRVal,
                                  self.parentWindow.ledGVal,
                                  self.parentWindow.ledBVal)
         self.led.setRGB(self.parentWindow.ledRVal,
                         self.parentWindow.ledGVal,
                         self.parentWindow.ledBVal)
+
+        self.parentWindow.backLEDVal = self.bk_sl.value()
+        self.parentWindow.setBackLED(self.parentWindow.backLEDVal)
+        self.update()
+
+    def ok(self):
+        self.updateConfig()
         self.hide()
         
     def cancel(self):
@@ -160,22 +182,26 @@ class SpheroDashboardForm(QtGui.QMainWindow):
     
     def __init__(self):
         super(QtGui.QMainWindow, self).__init__()
-        self.resize(600, 480)
-        print "init"        
-
-        self.ledRVal = 255
-        self.ledGVal = 255
-        self.ledBVal = 255
-        self.ledConfig = LEDConfig(self)
-        
-        self.initUI()
+        self.resize(600, 480) 
 
         rospy.init_node('sphero_dashboard', anonymous=True)
         self.cmdVelPub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
         self.cmdVelSub = rospy.Subscriber("cmd_vel", Twist, self.cmdVelCallback)
       
         self.ledPub = rospy.Publisher('set_color', ColorRGBA, queue_size=1)
+        self.backLedPub = rospy.Publisher('set_back_led', Float32, queue_size=1)   
 
+        self.ledRVal = 0
+        self.ledGVal = 0
+        self.ledBVal = 0
+        self.backLEDVal = 0
+        self.ledConfig = LEDConfig(self)
+        self.ledConfig.move(10, 10)
+        self.setLEDColor(self.ledRVal, self.ledGVal, self.ledBVal)
+        self.setBackLED( self.backLEDVal )
+        
+        self.initUI()
+       
         
     def initUI(self):
         
@@ -195,9 +221,14 @@ class SpheroDashboardForm(QtGui.QMainWindow):
     def showLedConfig(self):
         self.ledConfig.show()     
 
-    def setLED(self, r, g, b):
+    def setLEDColor(self, r, g, b):
         color = ColorRGBA(float(r)/255.0, float(g)/255.0, float(b)/255.0, 1.0)
         self.ledPub.publish(color)
+
+    def setBackLED(self, val):
+        light = Float32()
+        light.data = float(val)
+        self.backLedPub.publish(light)
 
     def cmdVelCallback(self, msg):
         msg_text = "x=" + str(msg.linear.x) + " y=" + str(msg.linear.y)
