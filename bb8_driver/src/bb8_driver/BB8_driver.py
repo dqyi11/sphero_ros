@@ -138,6 +138,8 @@ class BTInterface(btle.DefaultDelegate):
         self.peripheral = btle.Peripheral(deviceAddress, btle.ADDR_TYPE_RANDOM)
         self.peripheral.setDelegate(self)
 
+        self.target_address = deviceAddress
+
         self.seq = 0
 
         # Attribute UUIDs are identical to Ollie.

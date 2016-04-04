@@ -5,8 +5,12 @@ import time
 from bb8_driver import BB8_driver
 import sys
 bb8 = BB8_driver.Sphero()
-bb8.connect()
-
+try:
+    is_connected = bb8.connect()
+    print("connect to Sphero with address: %s" % bb8.bt.target_address) 
+    #print bb8.bt.target_address
+except:
+    print "Failed to conenct to BB8."
 
 bb8.start()
 time.sleep(2)
