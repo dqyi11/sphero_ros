@@ -498,6 +498,7 @@ class Sphero(threading.Thread):
         shortest angular distance to heading command)
         :param response: request response back from Sphero.
         """
+        print "heading " + str(heading)
         self.send(self.pack_cmd(REQ['CMD_SET_HEADING'], [(heading >> 8), (heading & 0xff)]), response)
 
     def set_stablization(self, enable, response):

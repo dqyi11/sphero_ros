@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, rospy
+import sys, rospy, math
 from PyQt4 import QtGui, QtCore
 from geometry_msgs.msg import Twist
 from std_msgs.msg import ColorRGBA, Float32, Bool
@@ -146,11 +146,21 @@ class LEDConfig(QtGui.QWidget):
 
 class DashboardWidget(QtGui.QWidget):
 
-    def __init__(self):
+    def __init__(self, parent):
         super(QtGui.QWidget, self).__init__()
+        self.parentWindow = parent
         self.initUI()
 
     def initUI(self):
+        self.headingSlider = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.headingSlider.setMinimum(0)
+        self.headingSlider.setMaximum(359)
+        self.headingSlider.setValue(180)
+        self.headingSlider.setTickPosition(QtGui.QSlider.TicksBelow)
+        self.headingSlider.setTickInterval(1)
+        self.setBtn = QtGui.QPushButton("Set Heading") 
+        self.setBtn.clicked.connect(self.updateHeading)
+        
         self.cmdVelLabel = QtGui.QLabel("cmd_vel")
         self.cmdVelTextbox = QtGui.QTextEdit()
         self.cmdVelTextbox.setReadOnly(True)   
@@ -159,12 +169,23 @@ class DashboardWidget(QtGui.QWidget):
         self.keyEventTextbox.setReadOnly(True)
 
         layout = QtGui.QVBoxLayout()
+        headingLayout = QtGui.QHBoxLayout()
+        headingLayout.addWidget(self.headingSlider)
+        headingLayout.addWidget(self.setBtn)
+        layout.addLayout(headingLayout)
         layout.addWidget(self.cmdVelLabel)
         layout.addWidget(self.cmdVelTextbox)
         layout.addWidget(self.keyEventLabel)
         layout.addWidget(self.keyEventTextbox)
         self.setLayout(layout)
         self.show()
+
+    def updateHeading(self):
+        val = self.headingSlider.value()
+        self.parentWindow.setHeading(val)
+        self.headingSlider.setValue(180)
+        self.update()
+        
 
     def handleCmdVelMsg(self, cmd_vel_text):
         self.cmdVelTextbox.moveCursor(QtGui.QTextCursor.End)
@@ -190,6 +211,7 @@ class SpheroDashboardForm(QtGui.QMainWindow):
       
         self.ledPub = rospy.Publisher('set_color', ColorRGBA, queue_size=1)
         self.backLedPub = rospy.Publisher('set_back_led', Float32, queue_size=1)   
+        self.headingPub = rospy.Publisher('set_heading', Float32, queue_size=1)
 
         self.ledRVal = 0
         self.ledGVal = 0
@@ -198,7 +220,7 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         self.ledConfig = LEDConfig(self)
         self.ledConfig.move(10, 10)
         self.setLEDColor(self.ledRVal, self.ledGVal, self.ledBVal)
-        self.setBackLED( self.backLEDVal )
+        self.setBackLED(self.backLEDVal)
         
         self.initUI()
        
@@ -212,7 +234,7 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         ledMenu = menubar.addMenu('&LED')
         ledMenu.addAction(ledAction)        
 
-        self.dashboard = DashboardWidget()
+        self.dashboard = DashboardWidget(self)
         self.setCentralWidget(self.dashboard)
 
         self.setWindowTitle("Sphero dashboard")
@@ -229,6 +251,11 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         light = Float32()
         light.data = float(val)
         self.backLedPub.publish(light)
+
+    def setHeading(self, val):
+        heading = Float32()
+        heading.data = float(val)*2*math.pi/360.0
+        self.headingPub.publish(heading)
 
     def cmdVelCallback(self, msg):
         msg_text = "x=" + str(msg.linear.x) + " y=" + str(msg.linear.y)
@@ -285,18 +312,18 @@ class SpheroDashboardForm(QtGui.QMainWindow):
             self.dashboard.handleKeyText(key_text)
 
     def keyPressEvent(self, e):    
-        print "key press " + str(e.key())     
+        #print "key press " + str(e.key())     
         if e.key() == QtCore.Qt.Key_L:
-            print "letf"
+            #print "letf"
             self.processDirectionKey(0)
         elif e.key() == QtCore.Qt.Key_R:
-            print "right"
+            #print "right"
             self.processDirectionKey(2)        
         elif e.key() == QtCore.Qt.Key_U:
-            print "up"
+            #print "up"
             self.processDirectionKey(1)
         elif e.key() == QtCore.Qt.Key_D:
-            print "down"
+            #print "down"
             self.processDirectionKey(3)
 
         
