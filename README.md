@@ -15,4 +15,9 @@ Installation is now based on catkin:
       source <ws>/install/setup.bash
       ...
 
+## BB8 driver
+The connection is through BLUETOOTH LE
+
+      hcitool dev
+      hcitool (-i hci1) lescan
 
