@@ -152,6 +152,10 @@ class DashboardWidget(QtGui.QWidget):
         self.initUI()
 
     def initUI(self):
+        self.stabilizationRadioButton = QtGui.QRadioButton("Disable Stabilization")
+        self.stabilizationRadioButton.setChecked(False)
+        self.stabilizationRadioButton.toggled.connect(self.handleStabilizationCheck)
+ 
         self.headingSlider = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.headingSlider.setMinimum(0)
         self.headingSlider.setMaximum(359)
@@ -169,6 +173,7 @@ class DashboardWidget(QtGui.QWidget):
         self.keyEventTextbox.setReadOnly(True)
 
         layout = QtGui.QVBoxLayout()
+        layout.addWidget(self.stabilizationRadioButton)
         headingLayout = QtGui.QHBoxLayout()
         headingLayout.addWidget(self.headingSlider)
         headingLayout.addWidget(self.setBtn)
@@ -199,6 +204,15 @@ class DashboardWidget(QtGui.QWidget):
         self.keyEventTextbox.insertPlainText(key_text+"\n")
         self.keyEventTextbox.update()
 
+    def updateStablization(self, on):
+        self.parentWindow.setStabilization(on)
+
+    def handleStabilizationCheck(self):
+        if self.stabilizationRadioButton.isChecked() == True:
+            self.updateStablization(True)
+        else:
+            self.updateStablization(False)
+
 class SpheroDashboardForm(QtGui.QMainWindow):
     
     def __init__(self):
@@ -212,6 +226,7 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         self.ledPub = rospy.Publisher('set_color', ColorRGBA, queue_size=1)
         self.backLedPub = rospy.Publisher('set_back_led', Float32, queue_size=1)   
         self.headingPub = rospy.Publisher('set_heading', Float32, queue_size=1)
+        self.stabilizationPub = rospy.Publisher('disable_stabilization', Bool, queue_size=1)
 
         self.ledRVal = 0
         self.ledGVal = 0
@@ -256,6 +271,11 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         heading = Float32()
         heading.data = float(val)*2*math.pi/360.0
         self.headingPub.publish(heading)
+
+    def setStabilization(self, on):
+        stab_data = Bool()
+        stab_data.data = on
+        self.stabilizationPub.publish(stab_data)        
 
     def cmdVelCallback(self, msg):
         msg_text = "x=" + str(msg.linear.x) + " y=" + str(msg.linear.y)
