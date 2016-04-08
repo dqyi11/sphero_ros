@@ -30,7 +30,7 @@ bb8.set_heading(45, response)
 print "heading " + str(response)
 time.sleep(3)
 bb8.roll(100, 90, 1, response)
-print "rool " + str(response) 
+print "roll " + str(response) 
 bb8.disconnect()
 sys.exit(1)
 
