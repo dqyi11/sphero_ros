@@ -203,7 +203,7 @@ class BTInterface(object):
       self.sock=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
       self.sock.connect((self.target_address,self.port))
     except bluetooth.btcommon.BluetoothError as error:
-      sys.stdout.write(error.strerror)
+      sys.stdout.write(str(error.strerror)+"\n")
       sys.stdout.flush()
       time.sleep(5.0)
       sys.exit(1)
@@ -831,8 +831,8 @@ class Sphero(threading.Thread):
             self._async_callback_dict[IDCODE['COLLISION']](self.parse_collision_detect(data_packet, data_length))
           elif data_packet[2]==IDCODE['PWR_NOTIFY'] and self._async_callback_dict.has_key(IDCODE['PWR_NOTIFY']):
             self._async_callback_dict[IDCODE['PWR_NOTIFY']](self.parse_pwr_notify(data_packet, data_length))
-          else:
-            print "got a packet that isn't streaming: " + self.data2hexstr(data)
+          #else:
+          #  print "got a packet that isn't streaming: " + self.data2hexstr(data)
         else:
           raise RuntimeError("Bad SOF : " + self.data2hexstr(data))
       self.raw_data_buf=data
