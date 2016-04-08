@@ -28,9 +28,10 @@ sphero.set_back_led(255,False)
 time.sleep(3)
 print "enable stablization"
 sphero.set_stablization(1, False)
-time.sleep(3)
-print "set heading"
-sphero.set_heading(180, False)
+time.sleep(5)
+print "set aiming"
+sphero.roll(0, 90, 0, False)
+sphero.set_heading(90, False)
 time.sleep(3)
 time.sleep(15)
 #sphero.join()
