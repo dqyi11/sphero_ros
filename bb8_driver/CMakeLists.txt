@@ -8,6 +8,6 @@ catkin_package(DEPENDS ${ROSDEP_DEPS})
 
 catkin_python_setup()
 
-install(PROGRAMS scripts/BB8test.py
+install(PROGRAMS scripts/test_bb8_driver.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
