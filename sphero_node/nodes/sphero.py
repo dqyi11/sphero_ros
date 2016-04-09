@@ -238,7 +238,7 @@ class SpheroNode(object):
 
     def cmd_turn(self, msg):
         if self.is_connected:
-            self.robot.roll(0, int(self.msg.data), 0, False)
+            self.robot.roll(0, int(msg.data), 0, False)
     
     def set_color(self, msg):
         if self.is_connected:

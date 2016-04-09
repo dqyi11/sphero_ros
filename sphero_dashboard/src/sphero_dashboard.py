@@ -222,7 +222,7 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         rospy.init_node('sphero_dashboard', anonymous=True)
         self.cmdVelPub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
         self.cmdVelSub = rospy.Subscriber("cmd_vel", Twist, self.cmdVelCallback)
-        self.cmdTurnPub = rospy.Subscriber('cmd_turn', Float32, queue_size=1)     
+        self.cmdTurnPub = rospy.Publisher('cmd_turn', Float32, queue_size=1)     
  
         self.ledPub = rospy.Publisher('set_color', ColorRGBA, queue_size=1)
         self.backLedPub = rospy.Publisher('set_back_led', Float32, queue_size=1)   
