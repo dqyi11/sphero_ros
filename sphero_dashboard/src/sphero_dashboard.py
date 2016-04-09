@@ -160,8 +160,10 @@ class DashboardWidget(QtGui.QWidget):
         self.headingSlider.setMinimum(0)
         self.headingSlider.setMaximum(359)
         self.headingSlider.setValue(0)
+        self.currentHeadingSliderValue = 0
         self.headingSlider.setTickPosition(QtGui.QSlider.TicksBelow)
-        self.headingSlider.setTickInterval(1)
+        self.headingSlider.setTickInterval(45)
+        self.headingSlider.valueChanged.connect(self.headingChange)
         self.setBtn = QtGui.QPushButton("Set Heading") 
         self.setBtn.clicked.connect(self.updateHeading)
         
@@ -190,7 +192,11 @@ class DashboardWidget(QtGui.QWidget):
         self.parentWindow.setHeading(val)
         #self.headingSlider.setValue(180)
         self.update()
-        
+
+    def headingChange(self, int):
+        delta_val = self.headingSlider.value() - self.currentHeadingSliderValue 
+        #self.parentWindow.setHeading(delta_val)
+        self.currentHeadingSliderValue = self.headingSlider.value()
 
     def handleCmdVelMsg(self, cmd_vel_text):
         self.cmdVelTextbox.moveCursor(QtGui.QTextCursor.End)
