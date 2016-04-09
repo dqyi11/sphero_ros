@@ -98,7 +98,7 @@ class SpheroNode(object):
         self.collision_pub = rospy.Publisher('collision', SpheroCollision)
         self.diag_pub = rospy.Publisher('/diagnostics', DiagnosticArray)
         self.cmd_vel_sub = rospy.Subscriber('cmd_vel', Twist, self.cmd_vel, queue_size = 1)
-        self.cmd_vel_sub = rospy.Subscriber('cmd_vel', Twist, self.cmd_vel, queue_size = 1)
+        self.cmd_turn_sub = rospy.Subscriber('cmd_turn', Float32, self.cmd_turn, queue_size = 1)
         self.color_sub = rospy.Subscriber('set_color', ColorRGBA, self.set_color, queue_size = 1)
         self.back_led_sub = rospy.Subscriber('set_back_led', Float32, self.set_back_led, queue_size = 1)
         self.stabilization_sub = rospy.Subscriber('disable_stabilization', Bool, self.set_stabilization, queue_size = 1)
@@ -235,6 +235,10 @@ class SpheroNode(object):
             self.cmd_heading = self.normalize_angle_positive(math.atan2(msg.linear.x,msg.linear.y))*180/math.pi
             self.cmd_speed = math.sqrt(math.pow(msg.linear.x,2)+math.pow(msg.linear.y,2))
             self.robot.roll(int(self.cmd_speed), int(self.cmd_heading), 1, False)
+
+    def cmd_turn(self, msg):
+        if self.is_connected:
+            self.robot.roll(0, int(self.msg.data), 0, False)
     
     def set_color(self, msg):
         if self.is_connected:

@@ -159,7 +159,7 @@ class DashboardWidget(QtGui.QWidget):
         self.headingSlider = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.headingSlider.setMinimum(0)
         self.headingSlider.setMaximum(359)
-        self.headingSlider.setValue(180)
+        self.headingSlider.setValue(0)
         self.headingSlider.setTickPosition(QtGui.QSlider.TicksBelow)
         self.headingSlider.setTickInterval(1)
         self.setBtn = QtGui.QPushButton("Set Heading") 
@@ -188,7 +188,7 @@ class DashboardWidget(QtGui.QWidget):
     def updateHeading(self):
         val = self.headingSlider.value()
         self.parentWindow.setHeading(val)
-        self.headingSlider.setValue(180)
+        #self.headingSlider.setValue(180)
         self.update()
         
 
@@ -222,7 +222,8 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         rospy.init_node('sphero_dashboard', anonymous=True)
         self.cmdVelPub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
         self.cmdVelSub = rospy.Subscriber("cmd_vel", Twist, self.cmdVelCallback)
-      
+        self.cmdTurnPub = rospy.Subscriber('cmd_turn', Float32, queue_size=1)     
+ 
         self.ledPub = rospy.Publisher('set_color', ColorRGBA, queue_size=1)
         self.backLedPub = rospy.Publisher('set_back_led', Float32, queue_size=1)   
         self.headingPub = rospy.Publisher('set_heading', Float32, queue_size=1)
@@ -268,9 +269,9 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         self.backLedPub.publish(light)
 
     def setHeading(self, val):
-        heading = Float32()
-        heading.data = float(val)*2*math.pi/360.0
-        self.headingPub.publish(heading)
+        turning = Float32()
+        turning.data = float(val)
+        self.cmdTurnPub.publish(turning)
 
     def setStabilization(self, on):
         stab_data = Bool()
