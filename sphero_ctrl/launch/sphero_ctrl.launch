@@ -1,9 +1,10 @@
 <launch>
 
-  <include file="$(find colorblob_tracker)/launch/launch_sphero_color_blob_tracker.launch">
-    <remap from="tracked_pos" to="/sphero_pos" />
-    <remap from="target_pos" to="/sphero_target_pos" />
-  </include>
+  <include file="$(find colorblob_tracker)/launch/launch_sphero_color_blob_tracker.launch"/>
 
-  <node pkg="sphero_ctrl" type="sphero_ctrl.py" name="sphero_ctrl"/>
+  <node pkg="sphero_ctrl" type="sphero_ctrl.py" name="sphero_ctrl">
+    <remap from="/tracked_pos" to="/sphero_pos" />
+    <remap from="/target_pos" to="/sphero_target_pos" />
+  </node>
+
 </launch>
