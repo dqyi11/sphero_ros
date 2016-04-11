@@ -279,6 +279,10 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         turning.data = float(val)
         self.cmdTurnPub.publish(turning)
 
+        heading = Float32()
+        heading.data = 0.0
+        self.headingPub.publish(heading)
+
     def setStabilization(self, on):
         stab_data = Bool()
         stab_data.data = on
@@ -294,7 +298,7 @@ class SpheroDashboardForm(QtGui.QMainWindow):
             # left
             key_text = "LEFT"
             cv = Twist()
-            cv.linear.x = 100.0
+            cv.linear.x = -30.0
             cv.linear.y = 0.0
             cv.linear.z = 0.0
             cv.angular.x = 0.0
@@ -306,7 +310,7 @@ class SpheroDashboardForm(QtGui.QMainWindow):
             key_text = "UP"
             cv = Twist()
             cv.linear.x = 0.0
-            cv.linear.y = 100.0
+            cv.linear.y = 30.0
             cv.linear.z = 0.0
             cv.angular.x = 0.0
             cv.angular.y = 0.0
@@ -316,7 +320,7 @@ class SpheroDashboardForm(QtGui.QMainWindow):
             # right
             key_text = "RIGHT"
             cv = Twist()
-            cv.linear.x = -100.0
+            cv.linear.x = 30.0
             cv.linear.y = 0.0
             cv.linear.z = 0.0
             cv.angular.x = 0.0
@@ -328,7 +332,7 @@ class SpheroDashboardForm(QtGui.QMainWindow):
             key_text = "DOWN"
             cv = Twist()
             cv.linear.x = 0.0
-            cv.linear.y = -100.0
+            cv.linear.y = -30.0
             cv.linear.z = 0.0
             cv.angular.x = 0.0
             cv.angular.y = 0.0

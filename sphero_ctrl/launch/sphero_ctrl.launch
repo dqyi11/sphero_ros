@@ -2,11 +2,14 @@
 
   <include file="$(find colorblob_tracker)/launch/launch_sphero_color_blob_tracker.launch"/>
 
-  <include file="$(find sphero_dashboard)/launch/sphero_dashboard.launch" />
-
-  <node pkg="sphero_ctrl" type="sphero_ctrl.py" name="sphero_ctrl">
-    <remap from="/tracked_pos" to="/sphero_pos" />
-    <remap from="/target_pos" to="/sphero_target_pos" />
+  <include file="$(find sphero_dashboard)/launch/sphero_dashboard.launch">
+  </include>
+ 
+  <!--
+  <node pkg="sphero_ctrl" type="sphero_ctrl.py" name="sphero_ctrl" output="screen">
+  <remap from="tracked_pos" to="sphero_pos" />
+  <remap from="target_pos" to="sphero_target_pos" />
   </node>
+  -->
 
 </launch>
