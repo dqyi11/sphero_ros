@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 import rospy
-from geometry_msgs.msg import Pose2D
+from geometry_msgs.msg import Pose2D, Twist
+from std_msgs.msg import Float32
 
 class SpheroCtrl:
 
