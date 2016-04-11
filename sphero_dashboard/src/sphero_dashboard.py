@@ -156,6 +156,15 @@ class DashboardWidget(QtGui.QWidget):
         self.stabilizationRadioButton.setChecked(False)
         self.stabilizationRadioButton.toggled.connect(self.handleStabilizationCheck)
  
+        self.degLabel = QtGui.QLabel("Degree:")
+        self.degTextbox = QtGui.QLineEdit()
+        self.degTextbox.setText("15")
+        self.degTextbox.setFixedWidth(40)
+        self.leftBtn = QtGui.QPushButton("Counter Clockwise")
+        self.leftBtn.clicked.connect(self.leftRotate)
+        self.rightBtn = QtGui.QPushButton("Clockwise")
+        self.rightBtn.clicked.connect(self.rightRotate)
+
         self.headingSlider = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.headingSlider.setMinimum(0)
         self.headingSlider.setMaximum(359)
@@ -176,6 +185,12 @@ class DashboardWidget(QtGui.QWidget):
 
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self.stabilizationRadioButton)
+        ctrlLayout = QtGui.QHBoxLayout()
+        ctrlLayout.addWidget(self.degLabel)
+        ctrlLayout.addWidget(self.degTextbox)
+        ctrlLayout.addWidget(self.leftBtn)
+        ctrlLayout.addWidget(self.rightBtn)
+        layout.addLayout(ctrlLayout)
         headingLayout = QtGui.QHBoxLayout()
         headingLayout.addWidget(self.headingSlider)
         headingLayout.addWidget(self.setBtn)
@@ -192,6 +207,14 @@ class DashboardWidget(QtGui.QWidget):
         self.parentWindow.setHeading(val)
         #self.headingSlider.setValue(180)
         self.update()
+
+    def leftRotate(self):
+        deg = int(self.degTextbox.displayText())
+        self.parentWindow.setHeading(360-deg)
+
+    def rightRotate(self):
+        deg = int(self.degTextbox.displayText())
+        self.parentWindow.setHeading(15)
 
     def headingChange(self, int):
         delta_val = self.headingSlider.value() - self.currentHeadingSliderValue 
