@@ -46,16 +46,9 @@ class SpheroCtrl:
                 print "delta pos : " + str([delta_x, delta_y])
                 
                 cv = Twist()
-                if delta_x > 0:
-                    cv.linear.x = -10.0
-                elif delta_x < 0:
-                    cv.linear.x = 10.0
-                if delta_y > 0:
-                    cv.linear.y = 10.0
-                elif delta_y < 0:
-                    cv.linear.y = -10.0
-                #cv.linear.x = -self.K * delta_x 
-                #cv.linear.y = self.K * delta_y
+                
+                cv.linear.x = - max(self.K * delta_x , 10.0)
+                cv.linear.y = max(self.K * delta_y, 10.0)
                 cv.linear.z = 0.0
                 cv.angular.x = 0.0
                 cv.angular.y = 0.0
