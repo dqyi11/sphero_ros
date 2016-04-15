@@ -19,7 +19,13 @@ class SpheroCtrl:
         self.sphero_target_pos = [-1,-1]
         self.runnable = False
     
-        self.K = 0.2
+        self.Kp = 0.0
+        self.Kd = 0.0
+        self.Kp = rospy.get_param('/gains/P')
+        self.Kd = rospy.get_param('/gains/D')
+      
+        print "P " + str(self.Kp) + " D " + str(self.Kd)
+        
 
     def start(self):
         self.runnable = True
@@ -47,13 +53,13 @@ class SpheroCtrl:
                 
                 cv = Twist()
                 if delta_x > 0: 
-                    cv.linear.x = min(-self.K * delta_x , -10.0)
+                    cv.linear.x = min(-self.Kp * delta_x , -10.0)
                 elif delta_x < 0:
-                    cv.linear.x = max(-self.K * delta_x , 10.0)
+                    cv.linear.x = max(-self.Kp * delta_x , 10.0)
                 if delta_y > 0:
-                    cv.linear.y = max(self.K * delta_y, 10.0)
+                    cv.linear.y = max(self.Kp * delta_y, 10.0)
                 elif delta_y < 0:
-                    cv.linear.y = min(self.K * delta_y, -10.0)
+                    cv.linear.y = min(self.Kp * delta_y, -10.0)
                 cv.linear.z = 0.0
                 cv.angular.x = 0.0
                 cv.angular.y = 0.0
@@ -61,8 +67,6 @@ class SpheroCtrl:
                 print "vel : " + str([cv.linear.x, cv.linear.y])             
                 self.cmd_vel_pub.publish(cv)
                 
-
-        
 
     def sphero_target_pos_callback(self, msg):
         self.sphero_target_pos = [float(msg.x), float(msg.y)]

@@ -6,6 +6,7 @@
   <include file="$(find sphero_dashboard)/launch/sphero_dashboard.launch">
   </include>
 
+  <rosparam command="load" file="$(find sphero_ctrl)/launch/param/gains.yaml" />
   <node pkg="sphero_ctrl" type="sphero_ctrl.py" name="sphero_ctrl" output="screen">
     <!--
     <remap from="tracked_pos" to="sphero_pos" />
