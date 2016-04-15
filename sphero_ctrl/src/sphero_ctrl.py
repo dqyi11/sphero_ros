@@ -25,7 +25,7 @@ class SpheroCtrl:
         self.Kd = rospy.get_param('/gains/D')
       
         print "P " + str(self.Kp) + " D " + str(self.Kd)
-        
+        self.last_time = None 
 
     def start(self):
         self.runnable = True
@@ -50,16 +50,36 @@ class SpheroCtrl:
                 delta_x = self.sphero_target_pos[0] - current_pos[0]
                 delta_y = self.sphero_target_pos[1] - current_pos[1]
                 #print "delta pos : " + str([delta_x, delta_y])
-                
+                d_delta_x = 0.0
+                d_delta_y = 0.0          
+                if self.last_time == None:
+                   self.last_time = rospy.get_time()
+                   self.last_x = current_pos[0]
+                   self.last_y = current_pos[1]
+                else:
+                   new_time = rospy.get_time()
+                   delta_t = new_time - self.last_time
+                   delta_x = current_pos[0] - self.last_x 
+                   delta_y = current_pos[1] - self.last_y
+                   self.last_time = new_time
+                   self.last_x = current_pos[0]
+                   self.last_y = current_pos[1]
+                   d_gain_x = delta_x / delta_t
+                   d_gain_y = delta_y / delta_t
+                   print "d_delta " + str([d_gain_x, d_gain_y])
+
+                gain_x = self.Kp * delta_x + self.Kd * d_delta_x
+                gain_y = self.Kp * delta_y + self.Kd * d_delta_y
+ 
                 cv = Twist()
                 if delta_x > 0: 
-                    cv.linear.x = min(-self.Kp * delta_x , -10.0)
+                    cv.linear.x = min(- gain_x , -10.0)
                 elif delta_x < 0:
-                    cv.linear.x = max(-self.Kp * delta_x , 10.0)
+                    cv.linear.x = max(- gain_x , 10.0)
                 if delta_y > 0:
-                    cv.linear.y = max(self.Kp * delta_y, 10.0)
+                    cv.linear.y = max( gain_y, 10.0)
                 elif delta_y < 0:
-                    cv.linear.y = min(self.Kp * delta_y, -10.0)
+                    cv.linear.y = min( gain_y, -10.0)
                 cv.linear.z = 0.0
                 cv.angular.x = 0.0
                 cv.angular.y = 0.0
