@@ -47,13 +47,13 @@ class SpheroCtrl:
                 
                 cv = Twist()
                 if delta_x > 0: 
-                    cv.linear.x = min(-self.K * delta_x , -20.0)
+                    cv.linear.x = min(-self.K * delta_x , -10.0)
                 elif delta_x < 0:
-                    cv.linear.x = max(-self.K * delta_x , 20.0)
+                    cv.linear.x = max(-self.K * delta_x , 10.0)
                 if delta_y > 0:
-                    cv.linear.y = max(self.K * delta_y, 20.0)
+                    cv.linear.y = max(self.K * delta_y, 10.0)
                 elif delta_y < 0:
-                    cv.linear.y = min(self.K * delta_y, -20.0)
+                    cv.linear.y = min(self.K * delta_y, -10.0)
                 cv.linear.z = 0.0
                 cv.angular.x = 0.0
                 cv.angular.y = 0.0
