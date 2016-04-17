@@ -1,4 +1,4 @@
 <launch>
-  <node pkg="sphero_teleop" type="sphero_teleop_key.py" name="sphero_teleop_keyboard" output="sreen">
+  <node pkg="sphero_teleop" type="sphero_teleop_key.py" name="sphero_teleop_keyboard" output="screen">
   </node>
 </launch>

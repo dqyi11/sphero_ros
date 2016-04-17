@@ -22,14 +22,14 @@ CTRL-C to quit
 """
 
 moveBindings = {
-        'i':(10,0),
-        'o':(10,-10),
-        'j':(0,10),
-        'l':(0,-10),
-        'u':(10,10),
-        ',':(-10,0),
-        '.':(-10,10),
-        'm':(-10,-10),
+        'i':(0,20),
+        'o':(20,20),
+        'u':(-20,20),
+        'l':(20,0),
+        'j':(-20,0),
+        ',':(0,-20),
+        '.':(20,-20),
+        'm':(-20,-20),
            }
 
 speedBindings={
@@ -52,8 +52,6 @@ def getKey():
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
     return key
 
-speed = .2
-turn = 1
 
 def vels(x,y):
     return "current:\tx %s\ty %s " % (x,y)
@@ -68,9 +66,8 @@ if __name__=="__main__":
     y = 0
     k_x = 1.0
     k_y = 1.0
+    count = 0
     try:
-        print msg
-        print vels(speed,turn)
         while(1):
             key = getKey()
             if key in moveBindings.keys():
@@ -91,10 +88,20 @@ if __name__=="__main__":
                 y = 0
                 k_x = 1.0
                 k_y = 1.0
+            else:
+                count = count + 1
+                if count > 4:
+                    x = 0
+                    y = 0
+                    k_x = 1.0
+                    k_y = 1.0
+                if key == '\x03':
+                    break
+
             
             x_speed = k_x * x
             y_speed = k_y * y
-            vels(x_speed, y_speed)
+            print vels(x_speed, y_speed)
 
             twist = Twist()
             twist.linear.x = x_speed; twist.linear.y = y_speed; twist.linear.z = 0
