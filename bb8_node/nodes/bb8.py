@@ -255,7 +255,6 @@ class SpheroNode(object):
     def set_heading(self, msg):
         if self.is_connected:
             heading_deg = int(self.normalize_angle_positive(msg.data)*180.0/math.pi)
-            print "set_heading " + str(heading_deg)
             self.robot.set_heading(heading_deg, False)
 
     def set_angular_velocity(self, msg):

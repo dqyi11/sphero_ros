@@ -180,7 +180,7 @@ class BTInterface(btle.DefaultDelegate):
         chk ^= 255
 
         msg = [0xff, sop2, did, cid, seq, dlen] + data + [chk]
-        print 'cmd:', ' '.join([chr(c).encode('hex') for c in msg])
+        # print 'cmd:', ' '.join([chr(c).encode('hex') for c in msg])
         # Note: withResponse is very important. Most commands won't work without it.
         self.roll.write(''.join([chr(c) for c in msg]), withResponse=True)
 
@@ -261,6 +261,7 @@ class Sphero(threading.Thread):
         self.bt = BTInterface(self.deviceAddress)
         # self.is_connected = self.bt.connect()
         self.is_connected = True
+        print "BB8 connected"
         return True
 
     def inc_seq(self):
@@ -498,7 +499,7 @@ class Sphero(threading.Thread):
         shortest angular distance to heading command)
         :param response: request response back from Sphero.
         """
-        print "heading " + str(heading)
+        #print "heading " + str(heading)
         self.send(self.pack_cmd(REQ['CMD_SET_HEADING'], [(heading >> 8), (heading & 0xff)]), response)
 
     def set_stablization(self, enable, response):
@@ -579,7 +580,7 @@ class Sphero(threading.Thread):
         self.create_mask_list(sample_mask1, sample_mask2)
         self.stream_mask1 = sample_mask1
         self.stream_mask2 = sample_mask2
-        print data
+        #print data
         self.send(data, response)
 
     def set_filtered_data_strm(self, sample_div, sample_frames, pcnt, response):
@@ -833,7 +834,7 @@ class Sphero(threading.Thread):
         data = self.raw_data_buf
         while len(data) > 5:
             if data[:2] == RECV['SYNC']:
-                print "got response packet"
+                #print "got response packet"
                 # response packet
                 data_length = ord(data[4])
                 if data_length + 5 <= len(data):
@@ -922,8 +923,8 @@ class Sphero(threading.Thread):
         for i in range((data_length - 1) / 2):
             unpack = struct.unpack_from('>h', ''.join(data[5 + 2 * i:]))
             output[self.mask_list[i]] = unpack[0]
-        print self.mask_list
-        print output
+        #print self.mask_list
+        #print output
         return output
 
 

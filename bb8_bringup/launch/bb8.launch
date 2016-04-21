@@ -12,5 +12,5 @@
     <param name="vo_used" value="false"/>
     <param name="self_diagnose" value="false"/>
   </node>
-  <node pkg="bb8_node" type="bb8.py" name="bb8_node"/>
+  <node pkg="bb8_node" type="bb8.py" name="bb8_node" output="screen"/>
 </launch>
