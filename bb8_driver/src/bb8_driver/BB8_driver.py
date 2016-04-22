@@ -238,13 +238,12 @@ class BTInterface(btle.DefaultDelegate):
 
 
 class Sphero(threading.Thread):
-    def __init__(self, target_name='Sphero'):
+    def __init__(self, target_name='Sphero', target_addr=None):
         threading.Thread.__init__(self)
         self.target_name = target_name
         self.bt = None
         # Use "sudo hcitool lescan" to find BB8's MAC address input it at deviceAddress = 
-        #self.deviceAddress = 'DF:79:DD:9C:B6:1D'
-        self.deviceAddress = 'F3:14:73:89:3C:AB'
+        self.deviceAddress = target_addr #'F3:14:73:89:3C:AB'
         self.shutdown = False
         self.is_connected = False
         self.mask_list = None
