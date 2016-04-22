@@ -203,7 +203,7 @@ class BTInterface(object):
       self.sock=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
       self.sock.connect((self.target_address,self.port))
     except bluetooth.btcommon.BluetoothError as error:
-      sys.stdout.write(str(error.strerror)+"\n")
+      sys.stdout.write(str(error)+"\n")
       sys.stdout.flush()
       time.sleep(5.0)
       sys.exit(1)
@@ -253,7 +253,6 @@ class Sphero(threading.Thread):
     self.inc_seq()
  #   print req + [self.seq] + [len(cmd)+1] + cmd
     return req + [self.seq] + [len(cmd)+1] + cmd
-
   def data2hexstr(self, data):
     return ' '.join([ ("%02x"%ord(d)) for d in data])
 

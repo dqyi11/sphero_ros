@@ -13,5 +13,6 @@
     <param name="self_diagnose" value="false"/>
   </node>
 
+  <rosparam command="load" file="$(find sphero_bringup)/launch/param/bt_addr.yaml" />
   <node pkg="sphero_node" type="sphero.py" name="sphero_node" output="screen"/>
 </launch>
