@@ -1,11 +1,12 @@
 #!/usr/bin/env python
+# This file is modified from teleop code of turtlebot
 
 import rospy
 from geometry_msgs.msg import Twist
 import sys, select, termios, tty
 
 msg = """
-Control Your Turtlebot!
+Control Your Sphero!
 ---------------------------
 Moving around:
    u    i    o
