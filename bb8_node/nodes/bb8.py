@@ -253,7 +253,7 @@ class SpheroNode(object):
 
     def set_back_led(self, msg):
         if self.is_connected:
-            self.robot.set_back_led(msg.data, False)
+            self.robot.set_back_led(int(msg.data), False)
 
     def set_stabilization(self, msg):
         if self.is_connected:
