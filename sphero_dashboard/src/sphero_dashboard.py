@@ -32,9 +32,8 @@ class LEDConfig(QtGui.QWidget):
 
     def __init__(self, parentWindow):
         super(QtGui.QWidget, self).__init__()
-        self.parentWindow = parentWindow
+        self.parentWindow = parentWindow.parentWindow
         self.initUI()
-        self.hide()
     
     def initUI(self):   
 
@@ -79,11 +78,7 @@ class LEDConfig(QtGui.QWidget):
                               self.parentWindow.ledBVal])
         
         self.btnUpdate = QtGui.QPushButton("Update")
-        self.btnOK = QtGui.QPushButton("OK")
-        self.btnCancel = QtGui.QPushButton("Cancel")
         self.btnUpdate.clicked.connect(self.updateConfig)
-        self.btnOK.clicked.connect(self.ok)
-        self.btnCancel.clicked.connect(self.cancel)
 
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self.led)
@@ -105,8 +100,6 @@ class LEDConfig(QtGui.QWidget):
         layout.addLayout(bk_layout)
         btn_layout = QtGui.QHBoxLayout()
         btn_layout.addWidget(self.btnUpdate)
-        btn_layout.addWidget(self.btnOK)
-        btn_layout.addWidget(self.btnCancel)
         layout.addLayout(btn_layout)
         self.setLayout(layout)
         
@@ -128,16 +121,6 @@ class LEDConfig(QtGui.QWidget):
         self.parentWindow.setBackLED(self.parentWindow.backLEDVal)
         self.update()
 
-    def ok(self):
-        self.updateConfig()
-        self.hide()
-        
-    def cancel(self):
-        self.r_sl.setValue(self.parentWindow.ledRVal)
-        self.g_sl.setValue(self.parentWindow.ledGVal)
-        self.b_sl.setValue(self.parentWindow.ledBVal)
-        self.hide()
-
     def valuechange(self):
         self.led.setRGB(self.r_sl.value(),
                         self.g_sl.value(),
@@ -152,6 +135,8 @@ class DashboardWidget(QtGui.QWidget):
         self.initUI()
 
     def initUI(self):
+        
+        self.ledConfig = LEDConfig(self) 
         self.stabilizationRadioButton = QtGui.QRadioButton("Disable Stabilization")
         self.stabilizationRadioButton.setChecked(False)
         self.stabilizationRadioButton.toggled.connect(self.handleStabilizationCheck)
@@ -165,25 +150,8 @@ class DashboardWidget(QtGui.QWidget):
         self.rightBtn = QtGui.QPushButton("Clockwise")
         self.rightBtn.clicked.connect(self.rightRotate)
 
-        self.headingSlider = QtGui.QSlider(QtCore.Qt.Horizontal)
-        self.headingSlider.setMinimum(0)
-        self.headingSlider.setMaximum(359)
-        self.headingSlider.setValue(0)
-        self.currentHeadingSliderValue = 0
-        self.headingSlider.setTickPosition(QtGui.QSlider.TicksBelow)
-        self.headingSlider.setTickInterval(45)
-        self.headingSlider.valueChanged.connect(self.headingChange)
-        self.setBtn = QtGui.QPushButton("Set Heading") 
-        self.setBtn.clicked.connect(self.updateHeading)
-        
-        self.cmdVelLabel = QtGui.QLabel("cmd_vel")
-        self.cmdVelTextbox = QtGui.QTextEdit()
-        self.cmdVelTextbox.setReadOnly(True)   
-        self.keyEventLabel = QtGui.QLabel("Key")
-        self.keyEventTextbox = QtGui.QTextEdit()
-        self.keyEventTextbox.setReadOnly(True)
-
         layout = QtGui.QVBoxLayout()
+        layout.addWidget(self.ledConfig)
         layout.addWidget(self.stabilizationRadioButton)
         ctrlLayout = QtGui.QHBoxLayout()
         ctrlLayout.addWidget(self.degLabel)
@@ -191,14 +159,6 @@ class DashboardWidget(QtGui.QWidget):
         ctrlLayout.addWidget(self.leftBtn)
         ctrlLayout.addWidget(self.rightBtn)
         layout.addLayout(ctrlLayout)
-        headingLayout = QtGui.QHBoxLayout()
-        headingLayout.addWidget(self.headingSlider)
-        headingLayout.addWidget(self.setBtn)
-        layout.addLayout(headingLayout)
-        layout.addWidget(self.cmdVelLabel)
-        layout.addWidget(self.cmdVelTextbox)
-        layout.addWidget(self.keyEventLabel)
-        layout.addWidget(self.keyEventTextbox)
         self.setLayout(layout)
         self.show()
 
@@ -221,17 +181,7 @@ class DashboardWidget(QtGui.QWidget):
         #self.parentWindow.setHeading(delta_val)
         self.currentHeadingSliderValue = self.headingSlider.value()
 
-    def handleCmdVelMsg(self, cmd_vel_text):
-        self.cmdVelTextbox.moveCursor(QtGui.QTextCursor.End)
-        self.cmdVelTextbox.ensureCursorVisible()
-        self.cmdVelTextbox.insertPlainText(cmd_vel_text+"\n")
-        self.cmdVelTextbox.update()
 
-    def handleKeyText(self, key_text):
-        self.keyEventTextbox.moveCursor(QtGui.QTextCursor.End)
-        self.keyEventTextbox.ensureCursorVisible()
-        self.keyEventTextbox.insertPlainText(key_text+"\n")
-        self.keyEventTextbox.update()
 
     def updateStablization(self, on):
         self.parentWindow.setStabilization(on)
@@ -246,12 +196,10 @@ class SpheroDashboardForm(QtGui.QMainWindow):
     
     def __init__(self):
         super(QtGui.QMainWindow, self).__init__()
-        self.resize(600, 480) 
-        self.initUI()
+        self.resize(600, 300) 
+        
 
         rospy.init_node('sphero_dashboard', anonymous=True)
-        self.cmdVelPub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
-        self.cmdVelSub = rospy.Subscriber("cmd_vel", Twist, self.cmdVelCallback)
         self.cmdTurnPub = rospy.Publisher('cmd_turn', Float32, queue_size=1)     
  
         self.ledPub = rospy.Publisher('set_color', ColorRGBA, queue_size=1)
@@ -263,30 +211,19 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         self.ledGVal = 0
         self.ledBVal = 0
         self.backLEDVal = 0
-        self.ledConfig = LEDConfig(self)
-        self.ledConfig.move(10, 10)
+        
+        #self.ledConfig.move(10, 10)
         self.setLEDColor(self.ledRVal, self.ledGVal, self.ledBVal)
         self.setBackLED(self.backLEDVal)
-        
-       
-        
-    def initUI(self):
-        
-        ledAction = QtGui.QAction('LED', self)
-        ledAction.triggered.connect(self.showLedConfig)
-        
-        menubar = self.menuBar()
-        ledMenu = menubar.addMenu('&LED')
-        ledMenu.addAction(ledAction)        
 
+        self.initUI()
+
+
+    def initUI(self):       
         self.dashboard = DashboardWidget(self)
         self.setCentralWidget(self.dashboard)
-
         self.setWindowTitle("Sphero dashboard")
-        self.show()
-
-    def showLedConfig(self):
-        self.ledConfig.show()     
+        self.show() 
 
     def setLEDColor(self, r, g, b):
         color = ColorRGBA(float(r)/255.0, float(g)/255.0, float(b)/255.0, 1.0)
@@ -311,74 +248,6 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         stab_data.data = on
         self.stabilizationPub.publish(stab_data)        
 
-    def cmdVelCallback(self, msg):
-        msg_text = "x=" + str(msg.linear.x) + " y=" + str(msg.linear.y)
-        self.dashboard.handleCmdVelMsg(msg_text)
-
-    def processDirectionKey(self, key):
-        key_text = ""
-        if key == 0:
-            # left
-            key_text = "LEFT"
-            cv = Twist()
-            cv.linear.x = -30.0
-            cv.linear.y = 0.0
-            cv.linear.z = 0.0
-            cv.angular.x = 0.0
-            cv.angular.y = 0.0
-            cv.angular.z = 0.0
-            self.cmdVelPub.publish(cv)
-        elif key == 1:
-            # up
-            key_text = "UP"
-            cv = Twist()
-            cv.linear.x = 0.0
-            cv.linear.y = 30.0
-            cv.linear.z = 0.0
-            cv.angular.x = 0.0
-            cv.angular.y = 0.0
-            cv.angular.z = 0.0
-            self.cmdVelPub.publish(cv)
-        elif key == 2:
-            # right
-            key_text = "RIGHT"
-            cv = Twist()
-            cv.linear.x = 30.0
-            cv.linear.y = 0.0
-            cv.linear.z = 0.0
-            cv.angular.x = 0.0
-            cv.angular.y = 0.0
-            cv.angular.z = 0.0
-            self.cmdVelPub.publish(cv)
-        elif key == 3:
-            # down
-            key_text = "DOWN"
-            cv = Twist()
-            cv.linear.x = 0.0
-            cv.linear.y = -30.0
-            cv.linear.z = 0.0
-            cv.angular.x = 0.0
-            cv.angular.y = 0.0
-            cv.angular.z = 0.0
-            self.cmdVelPub.publish(cv)
-
-        if key_text != "":
-            self.dashboard.handleKeyText(key_text)
-
-    def keyPressEvent(self, e):    
-        #print "key press " + str(e.key())     
-        if e.key() == QtCore.Qt.Key_L:
-            #print "letf"
-            self.processDirectionKey(0)
-        elif e.key() == QtCore.Qt.Key_R:
-            #print "right"
-            self.processDirectionKey(2)        
-        elif e.key() == QtCore.Qt.Key_U:
-            #print "up"
-            self.processDirectionKey(1)
-        elif e.key() == QtCore.Qt.Key_D:
-            #print "down"
-            self.processDirectionKey(3)
 
         
 
