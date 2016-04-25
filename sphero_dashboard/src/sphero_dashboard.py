@@ -34,6 +34,7 @@ class LEDConfig(QtGui.QWidget):
         super(QtGui.QWidget, self).__init__()
         self.parentWindow = parentWindow.parentWindow
         self.initUI()
+        self.updateConfig()
     
     def initUI(self):   
 
