@@ -4,6 +4,10 @@ import struct
 import time
 from sphero_driver import sphero_driver
 import sys
+
+SPHERO_NAME = "Sphero-RBY"
+SPHERO_ADDR = "68:86:E7:07:85:E9"
+
 sphero = sphero_driver.Sphero()
 sphero.connect()
 sphero.set_raw_data_strm(40, 1 , 0, False)
