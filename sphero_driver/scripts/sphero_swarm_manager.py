@@ -67,7 +67,7 @@ class BluetoothConfig(QtGui.QWidget):
 
     def connectAllBluetoothDevice(self):
         for i in range(self.bluetoothDeviceList.count()):
-            item = self.bluetoohDeviceList.item(i)
+            item = self.bluetoothDeviceList.item(i)
             print "connect " + str(item.name)
             self.parentWindow.connectSphero(item.name, item.addr)
         self.scanBluetoothDevice()
@@ -82,6 +82,8 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
 
         self.disconnectBtn = QtGui.QPushButton("Disconnect")        
         self.disconnectBtn.clicked.connect(self.disconnectBluetoothDevice)
+        self.disconnectAllBtn = QtGui.QPushButton("Disconnect All")
+        self.disconnectAllBtn.clicked.connect(self.disconnectAllBluetoothDevice)
         self.testBtn = QtGui.QPushButton("Test")        
         self.testBtn.clicked.connect(self.testSphero)
 
@@ -91,6 +93,7 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
         btnLayout = QtGui.QHBoxLayout()
         btnLayout.addWidget(self.testBtn)
         btnLayout.addWidget(self.disconnectBtn)
+        
         layout.addLayout(btnLayout)
         self.setLayout(layout)
 
@@ -108,6 +111,13 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
                 print "disconnect " + str(item.name)
                 self.parentWindow.disconnectSphero(item.name, item.addr)
                 #self.spheroListWidget.takeItem( self.spheroListWidget.row(item) )
+
+    def disconnectAllBluetoothDevice(self):
+        for i in range(self.spheroListWidget.count()):
+            item = self.spheroListWidget.item(i)
+            print "disconnect " + str(item.name)
+            self.parentWindow.disconnectSphero(item.name, item.addr)
+        #self.scanBluetoothDevice()
 
     def testSphero(self):
         #print "test Sphero"
