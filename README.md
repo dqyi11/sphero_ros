@@ -5,14 +5,14 @@ BB-8 driver (from https://github.com/jchadwhite/SpheroBB8-python) is used in cre
 sphero_ros
 ==========
 
-checkout the [docs](http://mmwise.github.com/sphero_ros)
+checkout the [docs](http://dqyi11.github.com/sphero_ros)
 
 =======
 ## Installation
 Installation is now based on catkin:
 
       cd <ws>/src
-      git clone https://github.com/mmwise/sphero_ros
+      git clone https://github.com/dqyi11/sphero_ros
       cd <ws>
       catkin_make
       catkin_make install
