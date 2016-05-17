@@ -26,7 +26,6 @@ class BluetoothScanThread(QtCore.QThread):
         super(BluetoothScanThread, self).__init__()
         self.lock = lock
 
-
     def scan(self):
         with self.lock:
             print "scanning..."            
