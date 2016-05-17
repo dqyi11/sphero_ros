@@ -113,13 +113,17 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
         self.disconnectAllBtn.clicked.connect(self.disconnectAllBluetoothDevice)
         self.testBtn = QtGui.QPushButton("Test")        
         self.testBtn.clicked.connect(self.testSphero)
+        self.testAllBtn = QtGui.QPushButton("Test All")
+        self.testAllBtn.clicked.connect(self.testAllSphero)
 
         layout = QtGui.QVBoxLayout() 
         layout.addWidget(self.spheroLabel)
         layout.addWidget(self.spheroListWidget)
         btnLayout = QtGui.QHBoxLayout()
         btnLayout.addWidget(self.testBtn)
+        btnLayout.addWidget(self.testAllBtn)
         btnLayout.addWidget(self.disconnectBtn)
+        btnLayout.addWidget(self.disconnectAllBtn)
         
         layout.addLayout(btnLayout)
         self.setLayout(layout)
@@ -146,14 +150,70 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
             self.parentWindow.disconnectSphero(item.name, item.addr)
         #self.scanBluetoothDevice()
 
+
     def testSphero(self):
         #print "test Sphero"
         selected_items = self.spheroListWidget.selectedItems()
         if len(selected_items) > 0:
             for item in selected_items:
                 sphero = self.parentWindow.findSphero(item.addr)
-                self.parentWindow.testSphero(sphero)
+                print "TESTING " + str(sphero.target_name)
+         	print "disable stabilization"
+	        sphero.set_stablization(0, False)
+	        print "set color to RED"
+	        sphero.set_rgb_led(255,0,0,0,False)
+	        print "set color to GREEN"
+	        sphero.set_rgb_led(0,255,0,0,False)
+	        print "set color to BLUE"
+	        sphero.set_rgb_led(0,0,255,0,False)
+	        print "set back led"
+	        sphero.set_rgb_led(255,255,255,0,False)
+	        sphero.set_back_led(255,False)
+	        print "enable stablization"
+	        sphero.set_stablization(1, False)
+	        print "set aiming"
+	        sphero.roll(0, 90, 0, False) 
+	        sphero.set_heading(90, False)
 
+    def testAllSphero(self):
+        print "TESTING ALL"
+	print "disable stabilization"
+        for i in range(self.spheroListWidget.count()):
+            item = self.spheroListWidget.item(i)
+            sphero = self.parentWindow.findSphero(item.addr)
+	    sphero.set_stablization(0, False)
+	print "set color to RED"
+        for i in range(self.spheroListWidget.count()):
+            item = self.spheroListWidget.item(i)
+            sphero = self.parentWindow.findSphero(item.addr)
+	    sphero.set_rgb_led(255,0,0,0,False)
+	print "set color to GREEN"
+        for i in range(self.spheroListWidget.count()):
+            item = self.spheroListWidget.item(i)
+            sphero = self.parentWindow.findSphero(item.addr)
+	    sphero.set_rgb_led(0,255,0,0,False)
+	print "set color to BLUE"
+	for i in range(self.spheroListWidget.count()):
+            item = self.spheroListWidget.item(i)
+            sphero = self.parentWindow.findSphero(item.addr)
+            sphero.set_rgb_led(0,0,255,0,False)
+	print "set back led"
+	for i in range(self.spheroListWidget.count()):
+            item = self.spheroListWidget.item(i)
+            sphero = self.parentWindow.findSphero(item.addr)
+            sphero.set_rgb_led(255,255,255,0,False)
+            sphero.set_back_led(255,False)
+	print "enable stablization"
+        for i in range(self.spheroListWidget.count()):
+            item = self.spheroListWidget.item(i)
+            sphero = self.parentWindow.findSphero(item.addr)	
+            sphero.set_stablization(1, False)
+	print "set aiming"
+        for i in range(self.spheroListWidget.count()):
+            item = self.spheroListWidget.item(i)
+            sphero = self.parentWindow.findSphero(item.addr)
+	    sphero.roll(0, 90, 0, False)
+            sphero.set_heading(90, False)
 
 class SpheroSwarmManagerForm(QtGui.QMainWindow):
 
@@ -202,35 +262,7 @@ class SpheroSwarmManagerForm(QtGui.QMainWindow):
                  self.sphero_list.remove(s)
         
         self.spheroMgr.updateList()
-
-    def testSphero(self, sphero):
         
-        print "TESTING " + str(sphero.target_name)
-	time.sleep(2)
-	print "disable stabilization"
-	sphero.set_stablization(0, False)
-	time.sleep(3)
-	print "set color to RED"
-	sphero.set_rgb_led(255,0,0,0,False)
-	time.sleep(1)
-	print "set color to GREEN"
-	sphero.set_rgb_led(0,255,0,0,False)
-	time.sleep(1)
-	print "set color to BLUE"
-	sphero.set_rgb_led(0,0,255,0,False)
-	time.sleep(3)
-	print "set back led"
-	sphero.set_rgb_led(255,255,255,0,False)
-	sphero.set_back_led(255,False)
-	time.sleep(3)
-	print "enable stablization"
-	sphero.set_stablization(1, False)
-	time.sleep(5)
-	print "set aiming"
-	sphero.roll(0, 90, 0, False)
-	sphero.set_heading(90, False)
-	time.sleep(3)
-
     def findSphero(self, addr):
         for s in self.sphero_list:
             if s.target_address == addr:
