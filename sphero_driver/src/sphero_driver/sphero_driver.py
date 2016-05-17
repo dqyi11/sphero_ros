@@ -606,18 +606,18 @@ class Sphero(threading.Thread):
         Helper function to add all the data to the data strm mask, so
         that the user doesn't have to set the data strm manually.
     
-       :param sample_div: divisor of the maximum sensor sampling rate.
-       :param sample_frames: number of sample frames emitted per packet.
-       :param pcnt: packet count (set to 0 for unlimited streaming).
-       :param response: request response back from Sphero.
-       """
-       mask1 = 0
-       mask2 = 0
-       for value in STRM_MASK1.itervalues():
-           mask1 = mask1|value
-       for value in STRM_MASK2.itervalues():
-           mask2 = mask2|value
-       self.set_data_strm(sample_div, sample_frames, mask1, pcnt, mask2, response)
+        :param sample_div: divisor of the maximum sensor sampling rate.
+        :param sample_frames: number of sample frames emitted per packet.
+        :param pcnt: packet count (set to 0 for unlimited streaming).
+        :param response: request response back from Sphero.
+        """
+        mask1 = 0
+        mask2 = 0
+        for value in STRM_MASK1.itervalues():
+            mask1 = mask1|value
+        for value in STRM_MASK2.itervalues():
+            mask2 = mask2|value
+        self.set_data_strm(sample_div, sample_frames, mask1, pcnt, mask2, response)
 
     def config_collision_detect(self, method, Xt, Xspd, Yt, Yspd, ignore_time, response):
         """
