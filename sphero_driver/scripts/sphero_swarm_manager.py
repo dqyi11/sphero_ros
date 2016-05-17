@@ -96,6 +96,7 @@ class BluetoothConfig(QtGui.QWidget):
             item = self.bluetoothDeviceList.item(i)
             print "connect " + str(item.name)
             self.parentWindow.connectSphero(item.name, item.addr)
+            self.parentWindow.spheroMgr.updateList()
         self.scanBluetoothDevice()
 
 class SpheroSwarmManagerWidget(QtGui.QWidget):
@@ -148,6 +149,7 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
             print "disconnect " + str(item.name)
             self.parentWindow.disconnectSphero(item.name, item.addr)
         #self.scanBluetoothDevice()
+        self.updateList()
 
 
     def testSphero(self):
