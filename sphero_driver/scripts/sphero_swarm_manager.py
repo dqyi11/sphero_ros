@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, rospy, math, bluetooth, time
+import sys, rospy, math, bluetooth, time, threading
 from PyQt4 import QtGui, QtCore
 from sphero_driver import sphero_driver
 
@@ -15,11 +15,30 @@ class BluetoothListItem(QtGui.QListWidgetItem):
     def __repr__(self):
         return str(self.name) + "   " + str(self.addr)
 
+class BluetoothScanThread(QtCore.QThread):
+   
+    def __init__(self, lock):
+        super(BluetoothScanThread, self).__init__()
+        self.lock = lock
+
+    def scan(self):
+        with self.lock:
+            print "scanning..."
+            device_list = []
+            nearby_devices = bluetooth.discover_devices(lookup_names=True)
+            print "finished"
+            for bdaddr, bdname in nearby_devices:
+                device_list.append((bdname, bdaddr))
+                print "find " + str(bdname) + " " + str(bdaddr)
+               
+            self.emit(QtCore.SIGNAL("updateScanDeviceList(PyQt_PyObject)"), device_list)
+
 class BluetoothConfig(QtGui.QWidget):
 
     def __init__(self, parentWindow):
         super(QtGui.QWidget, self).__init__()
-        self.parentWindow = parentWindow
+        self.parentWindow = parentWindow        
+        self.mutual_lock = threading.Lock()
         self.initUI()
 
     def initUI(self):
@@ -31,6 +50,10 @@ class BluetoothConfig(QtGui.QWidget):
         self.connectBtn.clicked.connect(self.connectBluetoothDevice)
         self.connectAllBtn = QtGui.QPushButton("Connect All")
         self.connectAllBtn.clicked.connect(self.connectAllBluetoothDevice)
+
+        self.bluetooth_scan = BluetoothScanThread( self.mutual_lock )
+        self.bluetooth_scan.start()
+        self.connect(self, QtCore.SIGNAL("updateScanDeviceList(PyQt_PyObject)"), self.updateDeviceList)
        
         layout = QtGui.QVBoxLayout() 
         layout.addWidget(self.bluetoothLabel)
@@ -44,18 +67,17 @@ class BluetoothConfig(QtGui.QWidget):
         self.setLayout(layout)
 
     def scanBluetoothDevice(self):
+        self.bluetooth_scan.scan()
+
+    def updateDeviceList(self, device_list):
         self.bluetoothDeviceList.clear()
         self.bluetoothDeviceList.update()
-        self.devices = []
-        print "scanning..."
-        nearby_devices = bluetooth.discover_devices(lookup_names=True)
-        for bdaddr, bdname in nearby_devices:
-            list_item = BluetoothListItem(bdname, bdaddr)
+        print "receive " + str(device_list)
+        for bdevice in device_list:
+            list_item = BluetoothListItem(bdevice[0], bdevice[1])
             self.bluetoothDeviceList.addItem(list_item)
             print list_item
         self.bluetoothDeviceList.update()
-        print "finished"
-
 
     def connectBluetoothDevice(self):
         selected_items = self.bluetoothDeviceList.selectedItems()

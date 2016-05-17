@@ -222,7 +222,7 @@ class BTInterface(object):
 
 class Sphero(threading.Thread):
 
-  def __init__(self, target_name = 'Sphero', target_addr = None):
+  def __init__(self, target_name = 'Sphero', target_addr = None, lock = None):
     threading.Thread.__init__(self)
     self.target_name = target_name
     self.target_address = target_addr
@@ -234,7 +234,10 @@ class Sphero(threading.Thread):
     self.stream_mask2 = None
     self.seq = 0
     self.raw_data_buf = []
-    self._communication_lock = threading.Lock()
+    if lock == None:
+        self._communication_lock = threading.Lock()
+    else:
+        self._communication_lock = lock
     self._async_callback_dict = dict()
     self._sync_callback_dict = dict()
     self._sync_callback_queue = []
@@ -342,6 +345,7 @@ class Sphero(threading.Thread):
     enable auto reconnect mode
     :param response: request response back from Sphero.
     """
+    self._communication_lock.acquire()
     self.send(self.pack_cmd(REQ['CMD_SET_AUTO_RECONNECT'],[enable,time]), response)
 
   def get_auto_reconnect(self, response):
