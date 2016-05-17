@@ -88,7 +88,7 @@ class BluetoothConfig(QtGui.QWidget):
         if len(selected_items) > 0:
             for item in selected_items:
                 print "connect " + str(item.name)
-                self.parentWindow.connectSphero(item.name, item.addr)
+                self.parentWindow.connectSphero(item.name, item.addr, True)
             self.scanBluetoothDevice()
 
     def connectAllBluetoothDevice(self):
@@ -139,7 +139,7 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
         if len(selected_items) > 0:
             for item in selected_items:
                 print "disconnect " + str(item.name)
-                self.parentWindow.disconnectSphero(item.name, item.addr)
+                self.parentWindow.disconnectSphero(item.name, item.addr, True)
                 #self.spheroListWidget.takeItem( self.spheroListWidget.row(item) )
 
     def disconnectAllBluetoothDevice(self):
@@ -241,7 +241,7 @@ class SpheroSwarmManagerForm(QtGui.QMainWindow):
     def configBluetooth(self):
         self.bluetoothConfig.show()      
 
-    def connectSphero(self, name, address):
+    def connectSphero(self, name, address, update_list=False):
         print "connect " + str(name) + "   " + str(address)
 
         if self.hasActiveSphero(address) == False:
@@ -250,17 +250,19 @@ class SpheroSwarmManagerForm(QtGui.QMainWindow):
             sphero.set_raw_data_strm(40, 1, 0, False)
             sphero.start()
             self.sphero_list.append(sphero)
+        
+        if update_list == True:
+            self.spheroMgr.updateList()
 
-        self.spheroMgr.updateList()
-
-    def disconnectSphero(self, name, address):
+    def disconnectSphero(self, name, address, update_list=False):
         print "disconnect " + str(name) + "   " + str(address)
         for s in self.sphero_list:
             if s.target_address == address:
                  s.disconnect()
                  self.sphero_list.remove(s)
-        
-        self.spheroMgr.updateList()
+
+        if update_list == True:
+            self.spheroMgr.updateList()
         
     def findSphero(self, addr):
         for s in self.sphero_list:
