@@ -243,8 +243,9 @@ class Sphero(threading.Thread):
     self._sync_callback_queue = []
 
   def connect(self):
-    self.bt = BTInterface(self.target_name, self.target_address)
-    self.is_connected = self.bt.connect()
+    with self._communication_lock:
+        self.bt = BTInterface(self.target_name, self.target_address)
+        self.is_connected = self.bt.connect()
     return True
 
   def inc_seq(self):

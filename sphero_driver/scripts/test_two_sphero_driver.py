@@ -1,14 +1,14 @@
 #!/usr/bin/python
 import bluetooth
 import struct
-import time
+import time, threading
 from sphero_driver import sphero_driver
 import sys
 
-SPHERO1_NAME = "Sphero-YBO"
-SPHERO1_ADDR = "68:86:E7:07:89:37"
-SPHERO2_NAME = "Sphero-ROB"
-SPHERO2_ADDR = "68:86:E7:02:8D:CF"
+SPHERO1_NAME = "Sphero-RBY"
+SPHERO1_ADDR = "68:86:E7:07:85:E9"
+SPHERO2_NAME = "Sphero-OGG"
+SPHERO2_ADDR = "68:86:E7:02:8B:A0"
 
 NO_WAIT = True
 
@@ -21,8 +21,11 @@ sphero1.set_raw_data_strm(40, 1 , 0, False)
 sphero2.set_raw_data_strm(40, 1 , 0, False)
 
 sphero1.start()
+if NO_WAIT == False:
+    time.sleep(2)
 sphero2.start()
-time.sleep(2)
+if NO_WAIT == False:
+    time.sleep(2)
 print "disable stabilization"
 sphero1.set_stablization(0, False)
 if NO_WAIT == False:
@@ -82,7 +85,9 @@ if NO_WAIT == False:
 sphero2.set_heading(90, False)
 if NO_WAIT == False:
     time.sleep(2)
-#sphero.join()
+#sphero1.join()
+#sphero2.join()a
+time.sleep(5)
 print "disconnet"
 sphero1.disconnect()
 if NO_WAIT == False:

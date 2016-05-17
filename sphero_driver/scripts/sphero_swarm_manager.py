@@ -26,6 +26,7 @@ class BluetoothScanThread(QtCore.QThread):
         super(BluetoothScanThread, self).__init__()
         self.lock = lock
 
+
     def scan(self):
         with self.lock:
             print "scanning..."            
@@ -34,8 +35,7 @@ class BluetoothScanThread(QtCore.QThread):
             device_list = BluetoothDeviceList()
             for bdaddr, bdname in nearby_devices:
                 device_list.list.append((bdname, bdaddr))
-                print "find " + str(bdname) + " " + str(bdaddr)
-               
+                print "find " + str(bdname) + " " + str(bdaddr) 
             self.emit(QtCore.SIGNAL("updateScanDeviceList(PyQt_PyObject)"), device_list)
 
 class BluetoothConfig(QtGui.QWidget):
@@ -58,7 +58,7 @@ class BluetoothConfig(QtGui.QWidget):
 
         self.bluetooth_scan = BluetoothScanThread( self.mutual_lock )
         self.bluetooth_scan.start()
-        self.connect(self, QtCore.SIGNAL("updateScanDeviceList(PyQt_PyObject)"), self.updateDeviceList)
+        self.connect(self.bluetooth_scan, QtCore.SIGNAL("updateScanDeviceList(PyQt_PyObject)"), self.updateDeviceList)
        
         layout = QtGui.QVBoxLayout() 
         layout.addWidget(self.bluetoothLabel)
@@ -77,11 +77,11 @@ class BluetoothConfig(QtGui.QWidget):
     def updateDeviceList(self, device_list):
         self.bluetoothDeviceList.clear()
         self.bluetoothDeviceList.update()
-        print "receive " + str(device_list.list)
+        #print "receive " + str(device_list.list)
         for bdevice in device_list.list:
             list_item = BluetoothListItem(bdevice[0], bdevice[1])
             self.bluetoothDeviceList.addItem(list_item)
-            print list_item
+            #print list_item
         self.bluetoothDeviceList.update()
 
     def connectBluetoothDevice(self):
