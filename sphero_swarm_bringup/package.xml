@@ -1,0 +1,19 @@
+<package>
+  <name>sphero_swarm_bringup</name>
+  <version>0.1.2</version>
+  <description>
+    sphero_bringup provides launch files for quickly bringup sphero swarm with robot_pose_ekf and urdf
+  </description>
+  <author>Daqing Yi</author>
+  <maintainer email="daqing.yi@byu.edu">Daqing Yi</maintainer>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/sphero_swarm_bringup</url>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>urdf</run_depend>
+  <run_depend>robot_state_publisher</run_depend>
+  <run_depend>sphero_swarm_node</run_depend>
+  <run_depend>sphero_description</run_depend>
+
+</package>
