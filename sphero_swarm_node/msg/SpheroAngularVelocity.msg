@@ -1,2 +1,2 @@
 string name
-Float32 angular_velocity
+float32 angular_velocity

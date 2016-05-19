@@ -1,2 +1,2 @@
 string name
-Bool disable
+bool disable

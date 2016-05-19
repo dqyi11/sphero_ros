@@ -165,13 +165,31 @@ class SpheroSwarmNode(object):
         name = req.name
         bt_addr = req.bt_addr
         print "add sphero (" + str(name) + " " + str(bt_addr) + ")"
-        return SpheroInfoResponse(-1)
+        try:
+            bt_addr = self.team_info[name]
+            sphero = Sphero(name, bt_addr, self, self.mutual_lock)
+            sphero.is_connected = sphero.robot.connect()
+	    rospy.loginfo("Connect to Sphero with address: %s" % bt_addr)
+            self.sphero_dict[name] = sphero
+            self.team_info[name] = bt_addr
+	except:
+            rospy.logerr("Failed to connect to %s." % name)
+            SpheroInfoResponse(0)
+
+        rospy.set_param('/sphero_swarm/team', self.team_info)
+        return SpheroInfoResponse(1)
 
     def remove_sphero(self, req):
         name = req.name
         bt_addr = req.bt_addr
         print "remove sphero (" + str(name) + " " + str(bt_addr) + ")"
-        return SpheroInfoResponse(-1)
+        sphero = self.sphero_dict[name]
+        sphero.robot.disconnect()
+        del self.sphero_dict[name]
+        del self.team_info[name]
+
+        rospy.set_param('/sphero_swarm/team', self.team_info)
+        return SpheroInfoResponse(1)
 
     def normalize_angle_positive(self, angle):
         return math.fmod(math.fmod(angle, 2.0*math.pi) + 2.0*math.pi, 2.0*math.pi);

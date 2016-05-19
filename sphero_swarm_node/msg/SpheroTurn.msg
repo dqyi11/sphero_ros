@@ -1,2 +1,2 @@
 string name
-Float32 turn
+float32 turn

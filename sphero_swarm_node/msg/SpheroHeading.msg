@@ -1,2 +1,2 @@
 string name
-Float32 heading
+float32 heading
