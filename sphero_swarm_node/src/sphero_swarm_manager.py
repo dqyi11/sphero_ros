@@ -62,18 +62,25 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
         layout.addLayout(btnLayout)
         self.setLayout(layout)
 
-    def refreshSpheroList(self):
-        pass
-
     def updateList(self):
         self.spheroListWidget.clear()
-        for s in self.parentWindow.sphero_list:
-            print "add " + str(s.target_name)
-            self.spheroListWidget.addItem(SpheroListItem(s.target_name, s.target_address))
+        for name in self.parentWindow.sphero_dict:
+            bt_addr = self.parentWindow.sphero_dict[name]
+            self.spheroListWidget.addItem(SpheroListItem( name, bt_addr ))
         self.spheroListWidget.update()
 
     def connectSphero(self):
-        pass
+        if self.nameLineEdit.text() == "":
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Name is null")
+            return
+        if self.btaddrLineEdit.text() == "":
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Name is null")
+            return
+        self.parentWindow.connectSphero(self.nameLineEdit.text(), self.btaddrLineEdit.text() )
 
     def disconnectSphero(self):
         selected_items = self.spheroListWidget.selectedItems()
@@ -161,7 +168,7 @@ class SpheroSwarmManagerForm(QtGui.QMainWindow):
     def __init__(self):
         super(QtGui.QMainWindow, self).__init__()
         self.resize(600, 400)
-        self.sphero_list = []
+        self.sphero_list = {}
         self.initUI()      
 
     def initUI(self):
@@ -173,7 +180,32 @@ class SpheroSwarmManagerForm(QtGui.QMainWindow):
         self.show() 
    
     def updateSpheroSwarm(self):
-        pass        
+
+        self.sphero_dict = rospy.set_param('/sphero_swarm/team')
+
+    def connectSphero(self, name, btaddr):
+        rospy.wait_for_service('add_sphero')
+        try:
+            add_sphero = rospy.ServiceProxy('add_sphero', SpheroInfo)
+            resp1 = add_sphero(name, btaddr)
+            if resp1.success > 0:
+                 print "%s (%s) has been added"% (name, btaddr)
+                 return True
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
+        return False
+
+    def disconnectSphero(self, name, btaddr):
+        rospy.wait_for_service('remove_sphero')
+        try:
+            remove_sphero = rospy.ServiceProxy('remove_sphero', SpheroInfo)
+            resp1 = remove_sphero(name, btaddr)
+            if resp1.success > 0:
+                 print "%s (%s) has been removed"% (name, btaddr)
+                 return True
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
+        return False                
     
   
 
