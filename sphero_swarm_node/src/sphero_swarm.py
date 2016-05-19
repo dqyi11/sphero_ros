@@ -201,7 +201,7 @@ class SpheroSwarmNode(object):
                 bt_addr = self.team_info[name]
                 print "add SPHERO (" + str(name) + " " + str(bt_addr) + ")"
                 sphero = SpheroAgent(name, bt_addr, self, self.mutual_lock)
-                print "start connecting"
+                #print "start connecting"
 		sphero.is_connected = sphero.robot.connect()
 		rospy.loginfo("Connect to Sphero with address: %s" % bt_addr)
                 self.sphero_dict[name] = sphero
@@ -215,7 +215,7 @@ class SpheroSwarmNode(object):
             sphero = self.sphero_dict[name]
             #setup streaming    
 	    sphero.robot.set_filtered_data_strm(self.sampling_divisor, 1 , 0, True)
-	    sphero.robot.add_async_callback(sphero_driver.IDCODE['DATA_STRM'], self.parse_data_strm)
+	    sphero.robot.add_async_callback(sphero_driver.IDCODE['DATA_STRM'], sphero.parse_data_strm)
 	    #setup power notification
 	    sphero.robot.set_power_notify(True, False)
 	    sphero.robot.add_async_callback(sphero_driver.IDCODE['PWR_NOTIFY'], sphero.parse_power_notify)
@@ -261,7 +261,7 @@ class SpheroSwarmNode(object):
         
         for sphero_name in self.sphero_dict:
             sphero = self.sphero_dict[sphero_name]
-            stat = DiagnosticStatus(name=sphero_name, level=DiagnosticStatus.OK, message=self.power_state_msg)
+            stat = DiagnosticStatus(name=sphero_name, level=DiagnosticStatus.OK, message=sphero.power_state_msg)
             #stat.message="Battery Status"
             if sphero.power_state == 3:
                 stat.level=DiagnosticStatus.WARN
