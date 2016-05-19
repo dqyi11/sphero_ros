@@ -11,7 +11,7 @@ from sphero_driver import sphero_driver
 import dynamic_reconfigure.server
 
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, TwistWithCovariance, Vector3
-from sphero_node.msg import SpheroCollision, SpheroOdometry, SpheroImu, SpheroTwist, SpheroColor, SpheroDisableStablization, SpheroTurn, SpheroBackLed, SpheroHeading
+from sphero_swarm_node.msg import SpheroSwarmCollision, SpheroOdometry, SpheroImu, SpheroTwist, SpheroColor, SpheroDisableStablization, SpheroTurn, SpheroBackLed, SpheroHeading, SpheroAngularVelocity
 #from std_msgs.msg import ColorRGBA, Float32, Bool
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 from sphero_node.cfg import ReconfigConfig
@@ -43,7 +43,7 @@ class Sphero(object):
     def parse_collision(self, data):
         if self.is_connected:
             now = rospy.Time.now()
-            collision = SpheroCollision()
+            collision = SpheroSwarmCollision()
             collision.header.stamp = now
             collision.name = self.robot_name
             collision.x = data["X"]
@@ -136,7 +136,7 @@ class SpheroSwarmNode(object):
     def _init_pubsub(self):
         self.odom_pub = rospy.Publisher('odom', SpheroOdometry)
         self.imu_pub = rospy.Publisher('imu', SpheroImu)
-        self.collision_pub = rospy.Publisher('collision', SpheroCollision)
+        self.collision_pub = rospy.Publisher('collision', SpheroSwarmCollision)
         self.diag_pub = rospy.Publisher('/diagnostics', DiagnosticArray)
         self.cmd_vel_sub = rospy.Subscriber('cmd_vel', SpheroTwist, self.cmd_vel, queue_size = 1)
         self.cmd_turn_sub = rospy.Subscriber('cmd_turn', SpheroTurn, self.cmd_turn, queue_size = 1)

@@ -29,7 +29,7 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
  
         self.spheroLabel = QtGui.QLabel("Sphero List")
         self.refreshBtn = QtGui.QPushButton("Refresh")
-        self.refreshBtn.clicked.connect(self.refreshSpheroList)
+        self.refreshBtn.clicked.connect(self.updateList)
         self.spheroListWidget = QtGui.QListWidget()
 
         self.disconnectBtn = QtGui.QPushButton("Disconnect")        
@@ -64,6 +64,10 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
 
     def updateList(self):
         self.spheroListWidget.clear()
+        self.parentWindow.updateSpheroSwarm()
+
+        print(self.parentWindow.sphero_dict)
+
         for name in self.parentWindow.sphero_dict:
             bt_addr = self.parentWindow.sphero_dict[name]
             self.spheroListWidget.addItem(SpheroListItem( name, bt_addr ))
@@ -168,7 +172,7 @@ class SpheroSwarmManagerForm(QtGui.QMainWindow):
     def __init__(self):
         super(QtGui.QMainWindow, self).__init__()
         self.resize(600, 400)
-        self.sphero_list = {}
+        self.sphero_dict = {}
         self.initUI()      
 
     def initUI(self):
@@ -181,7 +185,7 @@ class SpheroSwarmManagerForm(QtGui.QMainWindow):
    
     def updateSpheroSwarm(self):
 
-        self.sphero_dict = rospy.set_param('/sphero_swarm/team')
+        self.sphero_dict = rospy.get_param('/sphero_swarm/team')
 
     def connectSphero(self, name, btaddr):
         rospy.wait_for_service('add_sphero')
