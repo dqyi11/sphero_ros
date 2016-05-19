@@ -18,7 +18,7 @@ from sphero_node.cfg import ReconfigConfig
 
 from sphero_swarm_node.srv import SpheroInfo
 
-class Sphero(object):
+class SpheroAgent(object):
 
     def __init__(self, name, bt_addr, parent, lock):
         self.robot_name = name
@@ -26,7 +26,8 @@ class Sphero(object):
         self.parent = parent
         self.robot = sphero_driver.Sphero(self.robot_name, self.robot_bt_addr, lock)
     
-        self.imu = Imu()
+        self.imu = SpheroImu()
+        self.imu.name = name
         self.imu.orientation_covariance = [1e-6, 0, 0, 0, 1e-6, 0, 0, 0, 1e-6]
         self.imu.angular_velocity_covariance = [1e-6, 0, 0, 0, 1e-6, 0, 0, 0, 1e-6]
         self.imu.linear_acceleration_covariance = [1e-6, 0, 0, 0, 1e-6, 0, 0, 0, 1e-6]
@@ -159,7 +160,7 @@ class SpheroSwarmNode(object):
         self.diag_update_rate = rospy.Duration(rospy.get_param('~diag_update_rate', 1.0))
 
         self.team_info = rospy.get_param('/sphero_swarm/team')
-        print str(self.team_info)
+        #print str(self.team_info)
 
     def add_sphero(self, req):
         name = req.name
@@ -167,7 +168,7 @@ class SpheroSwarmNode(object):
         print "add sphero (" + str(name) + " " + str(bt_addr) + ")"
         try:
             bt_addr = self.team_info[name]
-            sphero = Sphero(name, bt_addr, self, self.mutual_lock)
+            sphero = SpheroAgent(name, bt_addr, self, self.mutual_lock)
             sphero.is_connected = sphero.robot.connect()
 	    rospy.loginfo("Connect to Sphero with address: %s" % bt_addr)
             self.sphero_dict[name] = sphero
@@ -198,7 +199,9 @@ class SpheroSwarmNode(object):
         for name in self.team_info:
 	    try:
                 bt_addr = self.team_info[name]
-                sphero = Sphero(name, bt_addr, self, self.mutual_lock)
+                print "add SPHERO (" + str(name) + " " + str(bt_addr) + ")"
+                sphero = SpheroAgent(name, bt_addr, self, self.mutual_lock)
+                print "start connecting"
 		sphero.is_connected = sphero.robot.connect()
 		rospy.loginfo("Connect to Sphero with address: %s" % bt_addr)
                 self.sphero_dict[name] = sphero
