@@ -107,7 +107,7 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
         selected_items = self.spheroListWidget.selectedItems()
         if len(selected_items) > 0:
             for item in selected_items:
-                sphero = self.parentWindow.sphero_dict(item.name)
+                sphero_name = item.name
                 print "TESTING " + str(sphero.target_name)
          	print "disable stabilization"
 	        sphero.set_stablization(0, False)
