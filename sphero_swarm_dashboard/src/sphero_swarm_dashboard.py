@@ -154,6 +154,7 @@ class DashboardWidget(QtGui.QWidget):
         self.rightBtn.clicked.connect(self.rightRotate)
 
         self.spheroListWidget = QtGui.QListWidget()
+        self.refreshBtn = QtGui.QPushButton("Refresh")
 
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self.ledConfig)
