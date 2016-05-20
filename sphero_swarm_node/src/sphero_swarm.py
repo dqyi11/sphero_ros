@@ -180,7 +180,7 @@ class SpheroSwarmNode(object):
             SpheroInfoResponse(0)
 
         rospy.set_param('/sphero_swarm/team', self.team_info)
-        rospy.setParam('/sphero_swarm/team', self.sphero_connected)
+        rospy.set_param('/sphero_swarm/connected', self.sphero_connected)
         return SpheroInfoResponse(1)
 
     def remove_sphero(self, req):
@@ -232,7 +232,7 @@ class SpheroSwarmNode(object):
 	    #now start receiving packets
 	    sphero.robot.start()
 
-        rospy.setParam('/sphero_swarm/team', self.sphero_connected)
+        rospy.set_param('/sphero_swarm/connected', self.sphero_connected)
 
     def spin(self):
         r = rospy.Rate(10.0)

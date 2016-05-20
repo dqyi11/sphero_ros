@@ -99,7 +99,6 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
             item = self.spheroListWidget.item(i)
             print "disconnect " + str(item.name)
             self.parentWindow.disconnectSphero(item.name, item.addr)
-
         self.updateList()
 
 
@@ -108,7 +107,7 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
         selected_items = self.spheroListWidget.selectedItems()
         if len(selected_items) > 0:
             for item in selected_items:
-                sphero = self.parentWindow.findSphero(item.addr)
+                sphero = self.parentWindow.sphero_dict(item.name)
                 print "TESTING " + str(sphero.target_name)
          	print "disable stabilization"
 	        sphero.set_stablization(0, False)
@@ -130,40 +129,33 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
     def testAllSpheros(self):
         print "TESTING ALL"
 	print "disable stabilization"
-        for i in range(self.spheroListWidget.count()):
-            item = self.spheroListWidget.item(i)
-            sphero = self.parentWindow.findSphero(item.addr)
+        for name in self.spehro_dict:
+            sphero = self.parentWindow.sphero_dict[name]
 	    sphero.set_stablization(0, False)
 	print "set color to RED"
-        for i in range(self.spheroListWidget.count()):
-            item = self.spheroListWidget.item(i)
-            sphero = self.parentWindow.findSphero(item.addr)
+        for name in self.spehro_dict:
+            sphero = self.parentWindow.sphero_dict[name]
 	    sphero.set_rgb_led(255,0,0,0,False)
 	print "set color to GREEN"
-        for i in range(self.spheroListWidget.count()):
-            item = self.spheroListWidget.item(i)
-            sphero = self.parentWindow.findSphero(item.addr)
+        for name in self.spehro_dict:
+            sphero = self.parentWindow.sphero_dict[name]
 	    sphero.set_rgb_led(0,255,0,0,False)
 	print "set color to BLUE"
-	for i in range(self.spheroListWidget.count()):
-            item = self.spheroListWidget.item(i)
-            sphero = self.parentWindow.findSphero(item.addr)
+        for name in self.spehro_dict:
+            sphero = self.parentWindow.sphero_dict[name]
             sphero.set_rgb_led(0,0,255,0,False)
 	print "set back led"
-	for i in range(self.spheroListWidget.count()):
-            item = self.spheroListWidget.item(i)
-            sphero = self.parentWindow.findSphero(item.addr)
+        for name in self.spehro_dict:
+            sphero = self.parentWindow.sphero_dict[name]
             sphero.set_rgb_led(255,255,255,0,False)
             sphero.set_back_led(255,False)
 	print "enable stablization"
-        for i in range(self.spheroListWidget.count()):
-            item = self.spheroListWidget.item(i)
-            sphero = self.parentWindow.findSphero(item.addr)	
+        for name in self.spehro_dict:
+            sphero = self.parentWindow.sphero_dict[name]
             sphero.set_stablization(1, False)
 	print "set aiming"
-        for i in range(self.spheroListWidget.count()):
-            item = self.spheroListWidget.item(i)
-            sphero = self.parentWindow.findSphero(item.addr)
+        for name in self.spehro_dict:
+            sphero = self.parentWindow.sphero_dict[name]
 	    sphero.roll(0, 90, 0, False)
             sphero.set_heading(90, False)
 
