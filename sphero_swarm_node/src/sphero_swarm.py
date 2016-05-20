@@ -128,6 +128,7 @@ class SpheroSwarmNode(object):
         self.update_rate = default_update_rate
         self.sampling_divisor = int(400/self.update_rate)
         self.sphero_dict = {}
+        self.sphero_connected = {}
         self._init_pubsub()
         self._init_params()
         
@@ -173,11 +174,13 @@ class SpheroSwarmNode(object):
 	    rospy.loginfo("Connect to Sphero with address: %s" % bt_addr)
             self.sphero_dict[name] = sphero
             self.team_info[name] = bt_addr
+            self.sphero_connected[name] = bt_addr
 	except:
             rospy.logerr("Failed to connect to %s." % name)
             SpheroInfoResponse(0)
 
         rospy.set_param('/sphero_swarm/team', self.team_info)
+        rospy.setParam('/sphero_swarm/team', self.sphero_connected)
         return SpheroInfoResponse(1)
 
     def remove_sphero(self, req):
@@ -188,8 +191,9 @@ class SpheroSwarmNode(object):
         sphero.robot.disconnect()
         del self.sphero_dict[name]
         del self.team_info[name]
+        del self.sphero_connected[name] = bt_addr
 
-        rospy.set_param('/sphero_swarm/team', self.team_info)
+        rospy.setParam('/sphero_swarm/team', self.sphero_connected)
         return SpheroInfoResponse(1)
 
     def normalize_angle_positive(self, angle):
@@ -205,6 +209,7 @@ class SpheroSwarmNode(object):
 		sphero.is_connected = sphero.robot.connect()
 		rospy.loginfo("Connect to Sphero with address: %s" % bt_addr)
                 self.sphero_dict[name] = sphero
+                self.sphero_connected[name] = bt_addr
 	    except:
 		rospy.logerr("Failed to connect to %s." % name)
 
@@ -226,6 +231,8 @@ class SpheroSwarmNode(object):
 	    sphero.robot.set_rgb_led(self.connect_color_red,self.connect_color_green,self.connect_color_blue,0,False)
 	    #now start receiving packets
 	    sphero.robot.start()
+
+        rospy.setParam('/sphero_swarm/team', self.sphero_connected)
 
     def spin(self):
         r = rospy.Rate(10.0)

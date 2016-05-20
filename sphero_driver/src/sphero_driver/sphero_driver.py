@@ -202,7 +202,7 @@ class BTInterface(object):
 
         try:
             self.sock=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-            self.sock.connect((self.target_address,self.port))
+            self.sock.connect((self.target_address, self.port))
         except bluetooth.btcommon.BluetoothError as error:
             sys.stdout.write(str(error)+"\n")
             sys.stdout.flush()
@@ -247,7 +247,13 @@ class Sphero(threading.Thread):
     def connect(self):
         with self._communication_lock:
             self.bt = BTInterface(self.target_name, self.target_address)
-            self.is_connected = self.bt.connect()
+            try_time = 0
+            while self.is_connected == False and try_time < 5:
+                print "try time %d ..." % try_time
+                self.is_connected = self.bt.connect()
+                try_time += 1
+                if self.is_connected == False:
+                    time.sleep(1)
         return True
 
     def inc_seq(self):

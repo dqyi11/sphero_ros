@@ -185,7 +185,7 @@ class SpheroSwarmManagerForm(QtGui.QMainWindow):
    
     def updateSpheroSwarm(self):
 
-        self.sphero_dict = rospy.get_param('/sphero_swarm/team')
+        self.sphero_dict = rospy.get_param('/sphero_swarm/connected')
 
     def connectSphero(self, name, btaddr):
         rospy.wait_for_service('add_sphero')
