@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, rospy, math, bluetooth, time, threading
+import sys, rospy, math, bluetooth, time, 
 from PyQt4 import QtGui, QtCore
 
 class SpheroListItem(QtGui.QListWidgetItem):

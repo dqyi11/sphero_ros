@@ -5,7 +5,7 @@ from PyQt4 import QtGui, QtCore
 #from geometry_msgs.msg import Twist
 #from std_msgs.msg import ColorRGBA, Float32, Bool
 
-from sphero_swarm_node import SpheroBackLed, SpheroColor, SpheroTwist, SpheroTurn, SpheroHeading, SpheroDisableStablization
+from sphero_swarm_node.msg import SpheroBackLed, SpheroColor, SpheroTwist, SpheroTurn, SpheroHeading, SpheroDisableStablization
 
 class LEDWidget(QtGui.QLabel):
    
@@ -140,9 +140,9 @@ class DashboardWidget(QtGui.QWidget):
     def initUI(self):
         
         self.ledConfig = LEDConfig(self) 
-        self.stabilizationRadioButton = QtGui.QRadioButton("Disable Stabilization")
-        self.stabilizationRadioButton.setChecked(False)
-        self.stabilizationRadioButton.toggled.connect(self.handleStabilizationCheck)
+        self.disableStabilizationRadioButton = QtGui.QRadioButton("Disable Stabilization")
+        self.disableStabilizationRadioButton.setChecked(False)
+        self.disableStabilizationRadioButton.toggled.connect(self.handleDisableStabilizationCheck)
  
         self.degLabel = QtGui.QLabel("Degree:")
         self.degTextbox = QtGui.QLineEdit()
@@ -155,6 +155,8 @@ class DashboardWidget(QtGui.QWidget):
 
         self.spheroListWidget = QtGui.QListWidget()
         self.refreshBtn = QtGui.QPushButton("Refresh")
+        btnGridLayout = QtGui.QGridLayout()
+        btnGridLayout.addWidget(refreshBtn, 0, 4)
 
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self.ledConfig)
@@ -166,6 +168,7 @@ class DashboardWidget(QtGui.QWidget):
         ctrlLayout.addWidget(self.rightBtn)
         layout.addLayout(ctrlLayout)
         layout.addWidget(self.spheroListWidget)
+        layout.addLayout(btnGridLayout)
         self.setLayout(layout)
         self.show()
 
@@ -188,14 +191,11 @@ class DashboardWidget(QtGui.QWidget):
         #self.parentWindow.setHeading(delta_val)
         self.currentHeadingSliderValue = self.headingSlider.value()
 
-    def updateStablization(self, on):
-        self.parentWindow.setStabilization(on)
-
-    def handleStabilizationCheck(self):
-        if self.stabilizationRadioButton.isChecked() == True:
-            self.updateStablization(True)
+    def handleDisableStabilizationCheck(self):
+        if self.disableStabilizationRadioButton.isChecked() == True:
+            self.updateDisableStablization(True)
         else:
-            self.updateStablization(False)
+            self.updateDisableStablization(False)
 
 class SpheroDashboardForm(QtGui.QMainWindow):
     
@@ -216,11 +216,10 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         self.ledBVal = 0
         self.backLEDVal = 0
 
-        self.setLEDColor(self.ledRVal, self.ledGVal, self.ledBVal)
-        self.setBackLED(self.backLEDVal)
+        #self.setLEDColor(self.ledRVal, self.ledGVal, self.ledBVal)
+        #self.setBackLED(self.backLEDVal)
 
         self.initUI()
-
 
     def initUI(self):       
         self.dashboard = DashboardWidget(self)
@@ -228,27 +227,23 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         self.setWindowTitle("Sphero Swarm dashboard")
         self.show() 
 
-    def setLEDColor(self, r, g, b):
-        color = SpheroColor(float(r)/255.0, float(g)/255.0, float(b)/255.0, 1.0)
+    def setLEDColor(self, name, r, g, b):
+        color = SpheroColor(name, float(r)/255.0, float(g)/255.0, float(b)/255.0, 1.0)
         self.ledPub.publish(color)
 
-    def setBackLED(self, val):
-        light = SpheroBackLed()
-        light.data = float(val)
+    def setBackLED(self, name, val):
+        light = SpheroBackLed(name, val)
         self.backLedPub.publish(light)
 
     def setHeading(self, val):
-        turning = SpheroTurn()
-        turning.data = float(val)
+        turning = SpheroTurn(name, val)
         self.cmdTurnPub.publish(turning)
 
-        heading = SpheroHeading()
-        heading.data = 0.0
+        heading = SpheroHeading(name, 0.0)
         self.headingPub.publish(heading)
 
-    def setStabilization(self, on):
-        stab_data = Bool()
-        stab_data.data = on
+    def setDisableStabilization(self, on):
+        stab_data = SpheroDisableStabilization(on)
         self.stabilizationPub.publish(stab_data)        
 
         
