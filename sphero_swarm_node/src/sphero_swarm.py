@@ -168,7 +168,6 @@ class SpheroSwarmNode(object):
         bt_addr = req.bt_addr
         print "add sphero (" + str(name) + " " + str(bt_addr) + ")"
         try:
-            bt_addr = self.team_info[name]
             sphero = SpheroAgent(name, bt_addr, self, self.mutual_lock)
             sphero.is_connected = sphero.robot.connect()
 	    rospy.loginfo("Connect to Sphero with address: %s" % bt_addr)
@@ -177,7 +176,7 @@ class SpheroSwarmNode(object):
             self.sphero_connected[name] = bt_addr
 	except:
             rospy.logerr("Failed to connect to %s." % name)
-            SpheroInfoResponse(0)
+            return SpheroInfoResponse(0)
 
         rospy.set_param('/sphero_swarm/team', self.team_info)
         rospy.set_param('/sphero_swarm/connected', self.sphero_connected)

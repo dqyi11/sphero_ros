@@ -84,13 +84,14 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
         self.spheroListWidget.update()
 
     def connectSphero(self):
-        if self.nameLineEdit.isEmpty():
+        if self.nameLineEdit.text().isEmpty():
             QtGui.QMessageBox.critical(self, "Message", "Name is null.")
             return
-        if self.btaddrLineEdit.isEmpty():
+        if self.btaddrLineEdit.text().isEmpty():
             QtGui.QMessageBox.critical(self, "Message", "Bluetooth address is null.")
             return
-        self.parentWindow.connectSphero(self.nameLineEdit.text(), self.btaddrLineEdit.text() )
+        self.parentWindow.connectSphero(str(self.nameLineEdit.text()), str(self.btaddrLineEdit.text()) )
+        self.updateList()
 
     def disconnectSphero(self):
         selected_items = self.spheroListWidget.selectedItems()
@@ -204,7 +205,7 @@ class SpheroSwarmManagerForm(QtGui.QMainWindow):
             add_sphero = rospy.ServiceProxy('add_sphero', SpheroInfo)
             resp1 = add_sphero(name, btaddr)
             if resp1.success > 0:
-                 print "%s (%s) has been added"% (name, btaddr)
+                 print "%s has been added"% name
                  return True
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
