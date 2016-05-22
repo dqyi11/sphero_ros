@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
-import sys, rospy, math, bluetooth, time, 
+import sys, rospy, math, bluetooth, time
 from PyQt4 import QtGui, QtCore
+from sphero_swarm_node.msg import SpheroBackLed, SpheroColor, SpheroTwist, SpheroTurn, SpheroHeading, SpheroDisableStablization
 
 class SpheroListItem(QtGui.QListWidgetItem):
     
@@ -19,6 +20,14 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
     def __init__(self, parentWindow):
         super(QtGui.QWidget, self).__init__()
         self.parentWindow = parentWindow
+
+        rospy.init_node('sphero_swarm_manager', anonymous=True)
+        self.cmdTurnPub = rospy.Publisher('cmd_turn', SpheroTurn, queue_size=1)     
+        self.cmdVelPub = rospy.Publisher('cmd_vel', SpheroTwist, queue_size=1)
+        self.ledPub = rospy.Publisher('set_color', SpheroColor, queue_size=1)
+        self.backLedPub = rospy.Publisher('set_back_led', SpheroBackLed, queue_size=1)   
+        self.headingPub = rospy.Publisher('set_heading', SpheroHeading, queue_size=1)
+        self.disableStabilizationPub = rospy.Publisher('disable_stabilization', SpheroDisableStablization, queue_size=1)
         
         self.nameLabel = QtGui.QLabel("Name")
         self.nameLineEdit = QtGui.QLineEdit()
@@ -108,56 +117,68 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
         if len(selected_items) > 0:
             for item in selected_items:
                 sphero_name = item.name
-                print "TESTING " + str(sphero.target_name)
+                print "TESTING " + str(sphero_name)
          	print "disable stabilization"
-	        sphero.set_stablization(0, False)
+                stab_data = SpheroDisableStabilization(sphero_name, False)
+                self.disableStabilizationPub.publish(stab_data)
 	        print "set color to RED"
-	        sphero.set_rgb_led(255,0,0,0,False)
+                color = SpheroColor(sphero_name, 1.0, 0.0, 0.0, 1.0)
+                self.ledPub.publish(color)
 	        print "set color to GREEN"
-	        sphero.set_rgb_led(0,255,0,0,False)
+	        color = SpheroColor(sphero_name, 0.0, 1.0, 0.0, 1.0)
+                self.ledPub.publish(color)
 	        print "set color to BLUE"
-	        sphero.set_rgb_led(0,0,255,0,False)
+	        color = SpheroColor(sphero_name, 0.0, 0.0, 1.0, 1.0)
+                self.ledPub.publish(color)
 	        print "set back led"
-	        sphero.set_rgb_led(255,255,255,0,False)
-	        sphero.set_back_led(255,False)
+	        color = SpheroColor(sphero_name, 1.0, 1.0, 1.0, 1.0)
+                self.ledPub.publish(color)
+	        light = SpheroBackLed(sphero_name, 255)
+                self.backLedPub.publish(light)
 	        print "enable stablization"
-	        sphero.set_stablization(1, False)
+	        stab_data = SpheroDisableStabilization(sphero_name, True)
+                self.disableStabilizationPub.publish(stab_data)
 	        print "set aiming"
-	        sphero.roll(0, 90, 0, False) 
-	        sphero.set_heading(90, False)
+                turning = SpheroTurn(sphero_name, 90)
+                self.cmdTurnPub.publish(turning)
+                heading = SpheroHeading(sphero_name, 0.0)
+                self.headingPub.publish(heading)
+
 
     def testAllSpheros(self):
         print "TESTING ALL"
 	print "disable stabilization"
-        for name in self.spehro_dict:
-            sphero = self.parentWindow.sphero_dict[name]
-	    sphero.set_stablization(0, False)
+        for sphero_name in self.parentWindow.sphero_dict:
+            stab_data = SpheroDisableStabilization(sphero_name, False)
+            self.disableStabilizationPub.publish(stab_data)
 	print "set color to RED"
-        for name in self.spehro_dict:
-            sphero = self.parentWindow.sphero_dict[name]
-	    sphero.set_rgb_led(255,0,0,0,False)
+        for sphero_name in self.parentWindow.sphero_dict:
+            color = SpheroColor(sphero_name, 1.0, 0.0, 0.0, 1.0)
+            self.ledPub.publish(color)
 	print "set color to GREEN"
-        for name in self.spehro_dict:
-            sphero = self.parentWindow.sphero_dict[name]
-	    sphero.set_rgb_led(0,255,0,0,False)
+        for sphero_name in self.parentWindow.sphero_dict:
+            color = SpheroColor(sphero_name, 0.0, 1.0, 0.0, 1.0)
+            self.ledPub.publish(color)
 	print "set color to BLUE"
-        for name in self.spehro_dict:
-            sphero = self.parentWindow.sphero_dict[name]
-            sphero.set_rgb_led(0,0,255,0,False)
+        for sphero_name in self.parentWindow.sphero_dict:
+            color = SpheroColor(sphero_name, 0.0, 0.0, 1.0, 1.0)
+            self.ledPub.publish(color)
 	print "set back led"
-        for name in self.spehro_dict:
-            sphero = self.parentWindow.sphero_dict[name]
-            sphero.set_rgb_led(255,255,255,0,False)
-            sphero.set_back_led(255,False)
+        for sphero_name in self.parentWindow.sphero_dict:
+            color = SpheroColor(sphero_name, 1.0, 1.0, 1.0, 1.0)
+            self.ledPub.publish(color)
+            light = SpheroBackLed(sphero_name, 255)
+            self.backLedPub.publish(light)
 	print "enable stablization"
-        for name in self.spehro_dict:
-            sphero = self.parentWindow.sphero_dict[name]
-            sphero.set_stablization(1, False)
+        for sphero_name in self.parentWindow.sphero_dict:
+            stab_data = SpheroDisableStabilization(sphero_name, False)
+            self.disableStabilizationPub.publish(stab_data)
 	print "set aiming"
-        for name in self.spehro_dict:
-            sphero = self.parentWindow.sphero_dict[name]
-	    sphero.roll(0, 90, 0, False)
-            sphero.set_heading(90, False)
+        for sphero_name in self.parentWindow.sphero_dict:
+            turning = SpheroTurn(sphero_name, 90)
+            self.cmdTurnPub.publish(turning)
+            heading = SpheroHeading(sphero_name, 0.0)
+            self.headingPub.publish(heading)
 
 class SpheroSwarmManagerForm(QtGui.QMainWindow):
 

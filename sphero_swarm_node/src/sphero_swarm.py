@@ -191,7 +191,7 @@ class SpheroSwarmNode(object):
         sphero.robot.disconnect()
         del self.sphero_dict[name]
         del self.team_info[name]
-        del self.sphero_connected[name] = bt_addr
+        del self.sphero_connected[name]
 
         rospy.setParam('/sphero_swarm/team', self.sphero_connected)
         return SpheroInfoResponse(1)

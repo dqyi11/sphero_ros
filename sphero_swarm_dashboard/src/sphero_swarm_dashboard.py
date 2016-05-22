@@ -209,7 +209,7 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         self.ledPub = rospy.Publisher('set_color', SpheroColor, queue_size=1)
         self.backLedPub = rospy.Publisher('set_back_led', SpheroBackLed, queue_size=1)   
         self.headingPub = rospy.Publisher('set_heading', SpheroHeading, queue_size=1)
-        self.stabilizationPub = rospy.Publisher('disable_stabilization', SpheroDisableStablization, queue_size=1)
+        self.disableStabilizationPub = rospy.Publisher('disable_stabilization', SpheroDisableStablization, queue_size=1)
 
         self.ledRVal = 0
         self.ledGVal = 0
@@ -244,7 +244,7 @@ class SpheroDashboardForm(QtGui.QMainWindow):
 
     def setDisableStabilization(self, on):
         stab_data = SpheroDisableStabilization(on)
-        self.stabilizationPub.publish(stab_data)        
+        self.disableStabilizationPub.publish(stab_data)        
 
         
 
