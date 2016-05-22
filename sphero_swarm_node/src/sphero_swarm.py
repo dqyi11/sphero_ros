@@ -315,9 +315,9 @@ class SpheroSwarmNode(object):
             return
         if sphero.is_connected:
             if not msg.disable:
-                sphero.robot.set_stablization(0, False)
-            else:
                 sphero.robot.set_stablization(1, False)
+            else:
+                sphero.robot.set_stablization(0, False)
 
     def set_heading(self, msg):
         sphero = self.sphero_dict.get(msg.name)
