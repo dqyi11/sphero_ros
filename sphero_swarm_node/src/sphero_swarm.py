@@ -11,12 +11,12 @@ from sphero_driver import sphero_driver
 import dynamic_reconfigure.server
 
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, TwistWithCovariance, Vector3
-from sphero_swarm_node.msg import SpheroSwarmCollision, SpheroOdometry, SpheroImu, SpheroTwist, SpheroColor, SpheroDisableStablization, SpheroTurn, SpheroBackLed, SpheroHeading, SpheroAngularVelocity
+from sphero_swarm_node.msg import SpheroSwarmCollision, SpheroOdometry, SpheroImu, SpheroTwist, SpheroColor, SpheroDisableStabilization, SpheroTurn, SpheroBackLed, SpheroHeading, SpheroAngularVelocity
 #from std_msgs.msg import ColorRGBA, Float32, Bool
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 from sphero_node.cfg import ReconfigConfig
 
-from sphero_swarm_node.srv import SpheroInfo
+from sphero_swarm_node.srv import SpheroInfo, SpheroInfoRequest, SpheroInfoResponse
 
 class SpheroAgent(object):
 
@@ -144,7 +144,7 @@ class SpheroSwarmNode(object):
         self.cmd_turn_sub = rospy.Subscriber('cmd_turn', SpheroTurn, self.cmd_turn, queue_size = 1)
         self.color_sub = rospy.Subscriber('set_color', SpheroColor, self.set_color, queue_size = 1)
         self.back_led_sub = rospy.Subscriber('set_back_led', SpheroBackLed, self.set_back_led, queue_size = 1)
-        self.stabilization_sub = rospy.Subscriber('disable_stabilization', SpheroDisableStablization, self.set_stabilization, queue_size = 1)
+        self.stabilization_sub = rospy.Subscriber('disable_stabilization', SpheroDisableStabilization, self.set_stabilization, queue_size = 1)
         self.heading_sub = rospy.Subscriber('set_heading', SpheroHeading, self.set_heading, queue_size = 1)
         self.angular_velocity_sub = rospy.Subscriber('set_angular_velocity', SpheroAngularVelocity, self.set_angular_velocity, queue_size = 1)
         self.reconfigure_srv = dynamic_reconfigure.server.Server(ReconfigConfig, self.reconfigure)
@@ -193,7 +193,7 @@ class SpheroSwarmNode(object):
         del self.team_info[name]
         del self.sphero_connected[name]
 
-        rospy.setParam('/sphero_swarm/team', self.sphero_connected)
+        rospy.set_param('/sphero_swarm/connected', self.sphero_connected)
         return SpheroInfoResponse(1)
 
     def normalize_angle_positive(self, angle):
@@ -207,7 +207,7 @@ class SpheroSwarmNode(object):
                 sphero = SpheroAgent(name, bt_addr, self, self.mutual_lock)
                 #print "start connecting"
 		sphero.is_connected = sphero.robot.connect()
-		rospy.loginfo("Connect to Sphero with address: %s" % bt_addr)
+		rospy.loginfo("Connect to Sphero with address: %s, (%s)" % (bt_addr, name))
                 self.sphero_dict[name] = sphero
                 self.sphero_connected[name] = bt_addr
 	    except:
@@ -218,19 +218,20 @@ class SpheroSwarmNode(object):
         
         for name in self.sphero_dict:
             sphero = self.sphero_dict[name]
-            #setup streaming    
-	    sphero.robot.set_filtered_data_strm(self.sampling_divisor, 1 , 0, True)
-	    sphero.robot.add_async_callback(sphero_driver.IDCODE['DATA_STRM'], sphero.parse_data_strm)
-	    #setup power notification
-	    sphero.robot.set_power_notify(True, False)
-	    sphero.robot.add_async_callback(sphero_driver.IDCODE['PWR_NOTIFY'], sphero.parse_power_notify)
-	    #setup collision detection
-	    sphero.robot.config_collision_detect(1, 45, 110, 45, 110, 100, False)
-	    sphero.robot.add_async_callback(sphero_driver.IDCODE['COLLISION'], sphero.parse_collision)
-	    #set the ball to connection color
-	    sphero.robot.set_rgb_led(self.connect_color_red,self.connect_color_green,self.connect_color_blue,0,False)
-	    #now start receiving packets
-	    sphero.robot.start()
+            if sphero.is_connected == True: 
+                #setup streaming    
+		sphero.robot.set_filtered_data_strm(self.sampling_divisor, 1 , 0, True)
+		sphero.robot.add_async_callback(sphero_driver.IDCODE['DATA_STRM'], sphero.parse_data_strm)
+		#setup power notification
+		sphero.robot.set_power_notify(True, False)
+		sphero.robot.add_async_callback(sphero_driver.IDCODE['PWR_NOTIFY'], sphero.parse_power_notify)
+		#setup collision detection
+		sphero.robot.config_collision_detect(1, 45, 110, 45, 110, 100, False)
+		sphero.robot.add_async_callback(sphero_driver.IDCODE['COLLISION'], sphero.parse_collision)
+		#set the ball to connection color
+		sphero.robot.set_rgb_led(self.connect_color_red,self.connect_color_green,self.connect_color_blue,0,False)
+		#now start receiving packets
+		sphero.robot.start()
 
         rospy.set_param('/sphero_swarm/connected', self.sphero_connected)
 

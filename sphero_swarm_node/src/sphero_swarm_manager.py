@@ -2,7 +2,8 @@
 
 import sys, rospy, math, bluetooth, time
 from PyQt4 import QtGui, QtCore
-from sphero_swarm_node.msg import SpheroBackLed, SpheroColor, SpheroTwist, SpheroTurn, SpheroHeading, SpheroDisableStablization
+from sphero_swarm_node.msg import SpheroBackLed, SpheroColor, SpheroTwist, SpheroTurn, SpheroHeading, SpheroDisableStabilization
+from sphero_swarm_node.srv import SpheroInfo, SpheroInfoRequest, SpheroInfoResponse
 
 class SpheroListItem(QtGui.QListWidgetItem):
     
@@ -27,7 +28,7 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
         self.ledPub = rospy.Publisher('set_color', SpheroColor, queue_size=1)
         self.backLedPub = rospy.Publisher('set_back_led', SpheroBackLed, queue_size=1)   
         self.headingPub = rospy.Publisher('set_heading', SpheroHeading, queue_size=1)
-        self.disableStabilizationPub = rospy.Publisher('disable_stabilization', SpheroDisableStablization, queue_size=1)
+        self.disableStabilizationPub = rospy.Publisher('disable_stabilization', SpheroDisableStabilization, queue_size=1)
         
         self.nameLabel = QtGui.QLabel("Name")
         self.nameLineEdit = QtGui.QLineEdit()
@@ -83,15 +84,11 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
         self.spheroListWidget.update()
 
     def connectSphero(self):
-        if self.nameLineEdit.text() == "":
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setText("Name is null")
+        if self.nameLineEdit.isEmpty():
+            QtGui.QMessageBox.critical(self, "Message", "Name is null.")
             return
-        if self.btaddrLineEdit.text() == "":
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setText("Name is null")
+        if self.btaddrLineEdit.isEmpty():
+            QtGui.QMessageBox.critical(self, "Message", "Bluetooth address is null.")
             return
         self.parentWindow.connectSphero(self.nameLineEdit.text(), self.btaddrLineEdit.text() )
 
@@ -100,7 +97,8 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
         if len(selected_items) > 0:
             for item in selected_items:
                 print "disconnect " + str(item.name)
-                self.parentWindow.disconnectSphero(item.name, item.addr, True)
+                self.parentWindow.disconnectSphero(item.name, item.addr)
+            self.updateList()
  
 
     def disconnectAllSpheros(self):

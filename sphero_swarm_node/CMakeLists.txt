@@ -11,7 +11,7 @@ add_message_files(FILES
                   SpheroTurn.msg
                   SpheroColor.msg
                   SpheroBackLed.msg
-                  SpheroDisableStablization.msg
+                  SpheroDisableStabilization.msg
                   SpheroHeading.msg
                   SpheroAngularVelocity.msg
                  )
@@ -29,5 +29,14 @@ catkin_package(DEPENDS std_msgs geometry_msgs dynamic_reconfigure message_runtim
 include_directories(${catkin_INCLUDE_DIRS})
 
 install(PROGRAMS src/sphero_swarm.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(PROGRAMS src/sphero_swarm_manager.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+
+install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
