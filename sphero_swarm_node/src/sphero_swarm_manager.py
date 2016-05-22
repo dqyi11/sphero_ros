@@ -32,10 +32,12 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
         
         self.nameLabel = QtGui.QLabel("Name")
         self.nameLineEdit = QtGui.QLineEdit()
-        self.btaddrLabel = QtGui.QLabel("BT ADDR")
+        self.btaddrLabel = QtGui.QLabel("Bluetooth Address")
         self.btaddrLineEdit = QtGui.QLineEdit()
         self.connectBtn = QtGui.QPushButton("Connect")
         self.connectBtn.clicked.connect(self.connectSphero)
+        self.clearBtn = QtGui.QPushButton("Clear")
+        self.clearBtn.clicked.connect(self.clearAddText)
  
         self.spheroLabel = QtGui.QLabel("Sphero List")
         self.refreshBtn = QtGui.QPushButton("Refresh")
@@ -92,6 +94,11 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
             return
         self.parentWindow.connectSphero(str(self.nameLineEdit.text()), str(self.btaddrLineEdit.text()) )
         self.updateList()
+
+    def clearAddText(self):
+        self.nameLineEdit.setText("")
+        self.nameLineEdit.setText("")
+        self.update()
 
     def disconnectSphero(self):
         selected_items = self.spheroListWidget.selectedItems()

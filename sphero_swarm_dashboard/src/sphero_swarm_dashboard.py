@@ -5,7 +5,18 @@ from PyQt4 import QtGui, QtCore
 #from geometry_msgs.msg import Twist
 #from std_msgs.msg import ColorRGBA, Float32, Bool
 
-from sphero_swarm_node.msg import SpheroBackLed, SpheroColor, SpheroTwist, SpheroTurn, SpheroHeading, SpheroDisableStablization
+from sphero_swarm_node.msg import SpheroBackLed, SpheroColor, SpheroTwist, SpheroTurn, SpheroHeading, SpheroDisableStabilization
+
+class SpheroListItem(QtGui.QListWidgetItem):
+    
+    def __init__(self, name, addr):
+        super(QtGui.QListWidgetItem, self).__init__()
+        self.name = name
+        self.addr = addr
+        self.setText(str(self))
+ 
+    def __repr__(self):
+        return str(self.name) + "   " + str(self.addr)
 
 class LEDWidget(QtGui.QLabel):
    
@@ -28,18 +39,17 @@ class LEDWidget(QtGui.QLabel):
         super(QtGui.QLabel, self).paintEvent(e)
         #qp = QtGui.QPainter()
         #qp.begin(self)
-        #qp.end()         
+        #qp.end()             
 
-class LEDConfig(QtGui.QWidget):
+class DashboardWidget(QtGui.QWidget):
 
-    def __init__(self, parentWindow):
+    def __init__(self, parent):
         super(QtGui.QWidget, self).__init__()
-        self.parentWindow = parentWindow.parentWindow
+        self.parentWindow = parent
         self.initUI()
-        self.updateConfig()
-    
-    def initUI(self):   
 
+    def initUI(self):
+    
         self.bk_label = QtGui.QLabel("back LED")
         self.bk_sl = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.bk_sl.setMinimum(0)
@@ -81,7 +91,26 @@ class LEDConfig(QtGui.QWidget):
                               self.parentWindow.ledBVal])
         
         self.btnUpdate = QtGui.QPushButton("Update")
-        self.btnUpdate.clicked.connect(self.updateConfig)
+        self.btnUpdate.clicked.connect(self.updateColor) 
+    
+        self.disableStabilizationRadioButton = QtGui.QRadioButton("Disable Stabilization")
+        self.disableStabilizationRadioButton.setChecked(False)
+        self.disableStabilizationRadioButton.toggled.connect(self.handleDisableStabilizationCheck)
+ 
+        self.degLabel = QtGui.QLabel("Degree:")
+        self.degTextbox = QtGui.QLineEdit()
+        self.degTextbox.setText("15")
+        self.degTextbox.setFixedWidth(40)
+        self.leftBtn = QtGui.QPushButton("Counter Clockwise")
+        self.leftBtn.clicked.connect(self.leftRotate)
+        self.rightBtn = QtGui.QPushButton("Clockwise")
+        self.rightBtn.clicked.connect(self.rightRotate)
+
+        self.spheroListWidget = QtGui.QListWidget()
+        self.refreshBtn = QtGui.QPushButton("Refresh")
+        self.refreshBtn.clicked.connect(self.parentWindow.refreshDevices)
+        btnGridLayout = QtGui.QGridLayout()
+        btnGridLayout.addWidget(self.refreshBtn, 0, 4)
 
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self.led)
@@ -103,64 +132,9 @@ class LEDConfig(QtGui.QWidget):
         layout.addLayout(bk_layout)
         btn_layout = QtGui.QHBoxLayout()
         btn_layout.addWidget(self.btnUpdate)
-        layout.addLayout(btn_layout)
-        self.setLayout(layout)
-        
-        self.show()
+        layout.addLayout(btn_layout)   
 
-    def updateConfig(self):
-        
-        self.parentWindow.ledRVal = self.r_sl.value()
-        self.parentWindow.ledGVal = self.g_sl.value()
-        self.parentWindow.ledBVal = self.b_sl.value()        
-        self.parentWindow.setLEDColor(self.parentWindow.ledRVal,
-                                 self.parentWindow.ledGVal,
-                                 self.parentWindow.ledBVal)
-        self.led.setRGB(self.parentWindow.ledRVal,
-                        self.parentWindow.ledGVal,
-                        self.parentWindow.ledBVal)
-
-        self.parentWindow.backLEDVal = self.bk_sl.value()
-        self.parentWindow.setBackLED(self.parentWindow.backLEDVal)
-        self.update()
-
-    def valuechange(self):
-        self.led.setRGB(self.r_sl.value(),
-                        self.g_sl.value(),
-                        self.b_sl.value())
-        self.led.update()
-
-class DashboardWidget(QtGui.QWidget):
-
-    def __init__(self, parent):
-        super(QtGui.QWidget, self).__init__()
-        self.parentWindow = parent
-        self.initUI()
-
-    def initUI(self):
-        
-        self.ledConfig = LEDConfig(self) 
-        self.disableStabilizationRadioButton = QtGui.QRadioButton("Disable Stabilization")
-        self.disableStabilizationRadioButton.setChecked(False)
-        self.disableStabilizationRadioButton.toggled.connect(self.handleDisableStabilizationCheck)
- 
-        self.degLabel = QtGui.QLabel("Degree:")
-        self.degTextbox = QtGui.QLineEdit()
-        self.degTextbox.setText("15")
-        self.degTextbox.setFixedWidth(40)
-        self.leftBtn = QtGui.QPushButton("Counter Clockwise")
-        self.leftBtn.clicked.connect(self.leftRotate)
-        self.rightBtn = QtGui.QPushButton("Clockwise")
-        self.rightBtn.clicked.connect(self.rightRotate)
-
-        self.spheroListWidget = QtGui.QListWidget()
-        self.refreshBtn = QtGui.QPushButton("Refresh")
-        btnGridLayout = QtGui.QGridLayout()
-        btnGridLayout.addWidget(refreshBtn, 0, 4)
-
-        layout = QtGui.QVBoxLayout()
-        layout.addWidget(self.ledConfig)
-        layout.addWidget(self.stabilizationRadioButton)
+        layout.addWidget(self.disableStabilizationRadioButton)
         ctrlLayout = QtGui.QHBoxLayout()
         ctrlLayout.addWidget(self.degLabel)
         ctrlLayout.addWidget(self.degTextbox)
@@ -171,6 +145,28 @@ class DashboardWidget(QtGui.QWidget):
         layout.addLayout(btnGridLayout)
         self.setLayout(layout)
         self.show()
+
+    def updateColor(self):
+        
+        self.parentWindow.ledRVal = self.r_sl.value()
+        self.parentWindow.ledGVal = self.g_sl.value()
+        self.parentWindow.ledBVal = self.b_sl.value()        
+        self.setLEDColor(self.parentWindow.ledRVal,
+                         self.parentWindow.ledGVal,
+                         self.parentWindow.ledBVal)
+        self.led.setRGB(self.parentWindow.ledRVal,
+                        self.parentWindow.ledGVal,
+                        self.parentWindow.ledBVal)
+
+        self.backLEDVal = self.bk_sl.value()
+        self.setBackLED(self.parentWindow.backLEDVal)
+        self.update()
+
+    def valuechange(self):
+        self.led.setRGB(self.r_sl.value(),
+                        self.g_sl.value(),
+                        self.b_sl.value())
+        self.led.update()
 
     def updateHeading(self):
         val = self.headingSlider.value()
@@ -197,19 +193,45 @@ class DashboardWidget(QtGui.QWidget):
         else:
             self.updateDisableStablization(False)
 
+    def setLEDColor(self, r, g, b):
+        selected_items = self.spheroListWidget.selectedItems()
+        if len(selected_items) > 0:
+            for item in selected_items:
+                self.parentWindow.setLEDColorByName(item.name, r, g, b)
+
+    def setBackLED(self, val):
+        selected_items = self.spheroListWidget.selectedItems()
+        if len(selected_items) > 0:
+            for item in selected_items:
+                self.parentWindow.setBackLEDByName(item.name, val)
+
+    def setHeading(self, val):
+        selected_items = self.spheroListWidget.selectedItems()
+        if len(selected_items) > 0:
+            for item in selected_items:
+                self.parentWindow.setHeadingByName(item.name, val)
+
+    def setDisableStabilization(self, on):
+        selected_items = self.spheroListWidget.selectedItems()
+        if len(selected_items) > 0:
+            for item in selected_items:
+                self.parentWindow.setDisableStabilizationByName(item.name, on)
+
+
 class SpheroDashboardForm(QtGui.QMainWindow):
     
     def __init__(self):
         super(QtGui.QMainWindow, self).__init__()
         self.resize(600, 300) 
         
+        self.sphero_dict = {}
         rospy.init_node('sphero_swarm_dashboard', anonymous=True)
         self.cmdTurnPub = rospy.Publisher('cmd_turn', SpheroTurn, queue_size=1)     
  
         self.ledPub = rospy.Publisher('set_color', SpheroColor, queue_size=1)
         self.backLedPub = rospy.Publisher('set_back_led', SpheroBackLed, queue_size=1)   
         self.headingPub = rospy.Publisher('set_heading', SpheroHeading, queue_size=1)
-        self.disableStabilizationPub = rospy.Publisher('disable_stabilization', SpheroDisableStablization, queue_size=1)
+        self.disableStabilizationPub = rospy.Publisher('disable_stabilization', SpheroDisableStabilization, queue_size=1)
 
         self.ledRVal = 0
         self.ledGVal = 0
@@ -225,28 +247,38 @@ class SpheroDashboardForm(QtGui.QMainWindow):
         self.dashboard = DashboardWidget(self)
         self.setCentralWidget(self.dashboard)
         self.setWindowTitle("Sphero Swarm dashboard")
-        self.show() 
+        self.show()   
 
-    def setLEDColor(self, name, r, g, b):
+    def refreshDevices(self):
+
+        self.dashboard.spheroListWidget.clear()
+        self.sphero_dict = rospy.get_param('/sphero_swarm/connected')
+
+        print(self.sphero_dict)
+
+        for name in self.sphero_dict:
+            bt_addr = self.sphero_dict[name]
+            self.dashboard.spheroListWidget.addItem(SpheroListItem( name, bt_addr ))
+        self.update()
+
+    def setLEDColorByName(self, name, r, g, b):
         color = SpheroColor(name, float(r)/255.0, float(g)/255.0, float(b)/255.0, 1.0)
         self.ledPub.publish(color)
 
-    def setBackLED(self, name, val):
+    def setBackLEDByName(self, name, val):
         light = SpheroBackLed(name, val)
         self.backLedPub.publish(light)
 
-    def setHeading(self, val):
+    def setHeadingByName(self, name, val):
         turning = SpheroTurn(name, val)
         self.cmdTurnPub.publish(turning)
 
         heading = SpheroHeading(name, 0.0)
         self.headingPub.publish(heading)
 
-    def setDisableStabilization(self, on):
-        stab_data = SpheroDisableStabilization(on)
-        self.disableStabilizationPub.publish(stab_data)        
-
-        
+    def setDisableStabilizationByName(self, name, on):
+        stab_data = SpheroDisableStabilization(name, on)
+        self.disableStabilizationPub.publish(stab_data)             
 
 if __name__ == '__main__':
 

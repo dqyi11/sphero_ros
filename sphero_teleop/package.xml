@@ -1,6 +1,6 @@
 <package>
   <name>sphero_teleop</name>
-  <version>0.1.2</version>
+  <version>0.0.1</version>
   <description>
     sphero_teleop provides teleoperation for Sphero.
   </description>

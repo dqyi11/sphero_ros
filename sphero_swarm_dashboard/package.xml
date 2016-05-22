@@ -1,6 +1,6 @@
 <package>
   <name>sphero_swarm_dashboard</name>
-  <version>0.1.2</version>
+  <version>0.0.5</version>
   <description>
     sphero_swarm_dashboard provides a GUI for displaying Sphero information.
   </description>

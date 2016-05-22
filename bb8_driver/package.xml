@@ -1,6 +1,6 @@
 <package>
   <name>bb8_driver</name>
-  <version>0.1.2</version>
+  <version>0.1.0</version>
   <description>
     bb8_driver provides a python based driver for interfacing with the BB8 over bluetooth.
   </description>
