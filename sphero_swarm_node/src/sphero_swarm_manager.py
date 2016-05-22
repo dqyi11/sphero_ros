@@ -118,25 +118,31 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
                 sphero_name = item.name
                 print "TESTING " + str(sphero_name)
          	print "disable stabilization"
-                stab_data = SpheroDisableStabilization(sphero_name, False)
+                stab_data = SpheroDisableStabilization(sphero_name, True)
                 self.disableStabilizationPub.publish(stab_data)
+                time.sleep(1)
 	        print "set color to RED"
                 color = SpheroColor(sphero_name, 1.0, 0.0, 0.0, 1.0)
                 self.ledPub.publish(color)
+                time.sleep(1)
 	        print "set color to GREEN"
 	        color = SpheroColor(sphero_name, 0.0, 1.0, 0.0, 1.0)
                 self.ledPub.publish(color)
+                time.sleep(1)
 	        print "set color to BLUE"
 	        color = SpheroColor(sphero_name, 0.0, 0.0, 1.0, 1.0)
                 self.ledPub.publish(color)
+                time.sleep(1)
 	        print "set back led"
 	        color = SpheroColor(sphero_name, 1.0, 1.0, 1.0, 1.0)
                 self.ledPub.publish(color)
 	        light = SpheroBackLed(sphero_name, 255)
                 self.backLedPub.publish(light)
+                time.sleep(1)
 	        print "enable stablization"
-	        stab_data = SpheroDisableStabilization(sphero_name, True)
+	        stab_data = SpheroDisableStabilization(sphero_name, False)
                 self.disableStabilizationPub.publish(stab_data)
+                time.sleep(1)
 	        print "set aiming"
                 turning = SpheroTurn(sphero_name, 90)
                 self.cmdTurnPub.publish(turning)
@@ -148,30 +154,36 @@ class SpheroSwarmManagerWidget(QtGui.QWidget):
         print "TESTING ALL"
 	print "disable stabilization"
         for sphero_name in self.parentWindow.sphero_dict:
-            stab_data = SpheroDisableStabilization(sphero_name, False)
+            stab_data = SpheroDisableStabilization(sphero_name, True)
             self.disableStabilizationPub.publish(stab_data)
+        time.sleep(1)
 	print "set color to RED"
         for sphero_name in self.parentWindow.sphero_dict:
             color = SpheroColor(sphero_name, 1.0, 0.0, 0.0, 1.0)
             self.ledPub.publish(color)
+        time.sleep(1)
 	print "set color to GREEN"
         for sphero_name in self.parentWindow.sphero_dict:
             color = SpheroColor(sphero_name, 0.0, 1.0, 0.0, 1.0)
             self.ledPub.publish(color)
+        time.sleep(1)
 	print "set color to BLUE"
         for sphero_name in self.parentWindow.sphero_dict:
             color = SpheroColor(sphero_name, 0.0, 0.0, 1.0, 1.0)
             self.ledPub.publish(color)
+        time.sleep(1)
 	print "set back led"
         for sphero_name in self.parentWindow.sphero_dict:
             color = SpheroColor(sphero_name, 1.0, 1.0, 1.0, 1.0)
             self.ledPub.publish(color)
             light = SpheroBackLed(sphero_name, 255)
             self.backLedPub.publish(light)
+        time.sleep(1)
 	print "enable stablization"
         for sphero_name in self.parentWindow.sphero_dict:
             stab_data = SpheroDisableStabilization(sphero_name, False)
             self.disableStabilizationPub.publish(stab_data)
+        time.sleep(1)
 	print "set aiming"
         for sphero_name in self.parentWindow.sphero_dict:
             turning = SpheroTurn(sphero_name, 90)

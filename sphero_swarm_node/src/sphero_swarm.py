@@ -144,7 +144,7 @@ class SpheroSwarmNode(object):
         self.cmd_turn_sub = rospy.Subscriber('cmd_turn', SpheroTurn, self.cmd_turn, queue_size = 1)
         self.color_sub = rospy.Subscriber('set_color', SpheroColor, self.set_color, queue_size = 1)
         self.back_led_sub = rospy.Subscriber('set_back_led', SpheroBackLed, self.set_back_led, queue_size = 1)
-        self.stabilization_sub = rospy.Subscriber('disable_stabilization', SpheroDisableStabilization, self.set_stabilization, queue_size = 1)
+        self.stabilization_sub = rospy.Subscriber('disable_stabilization', SpheroDisableStabilization, self.set_disable_stabilization, queue_size = 1)
         self.heading_sub = rospy.Subscriber('set_heading', SpheroHeading, self.set_heading, queue_size = 1)
         self.angular_velocity_sub = rospy.Subscriber('set_angular_velocity', SpheroAngularVelocity, self.set_angular_velocity, queue_size = 1)
         self.reconfigure_srv = dynamic_reconfigure.server.Server(ReconfigConfig, self.reconfigure)
@@ -309,15 +309,15 @@ class SpheroSwarmNode(object):
         if sphero.is_connected:
             sphero.robot.set_back_led(int(msg.back_led), False)
 
-    def set_stabilization(self, msg):
+    def set_disable_stabilization(self, msg):
         sphero = self.sphero_dict.get(msg.name)
         if sphero == None:
             return
         if sphero.is_connected:
             if not msg.disable:
-                sphero.robot.set_stablization(1, False)
-            else:
                 sphero.robot.set_stablization(0, False)
+            else:
+                sphero.robot.set_stablization(1, False)
 
     def set_heading(self, msg):
         sphero = self.sphero_dict.get(msg.name)
