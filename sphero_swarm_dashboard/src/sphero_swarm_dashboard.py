@@ -9,14 +9,17 @@ from sphero_swarm_node.msg import SpheroBackLed, SpheroColor, SpheroTwist, Spher
 
 class SpheroListItem(QtGui.QListWidgetItem):
     
-    def __init__(self, name, addr):
+    def __init__(self, name, addr, rgb, back_led, disable_stabilization):
         super(QtGui.QListWidgetItem, self).__init__()
         self.name = name
         self.addr = addr
+        self.rgb = rgb
+        self.back_led = back_led
+        self.disable_stabilization = disable_stabilization
         self.setText(str(self))
  
     def __repr__(self):
-        return str(self.name) + "   " + str(self.addr)
+        return str(self.name) + "   " + str(self.addr) 
 
 class LEDWidget(QtGui.QLabel):
    
@@ -46,15 +49,15 @@ class DashboardWidget(QtGui.QWidget):
     def __init__(self, parent):
         super(QtGui.QWidget, self).__init__()
         self.parentWindow = parent
+
         self.initUI()
 
     def initUI(self):
-    
         self.bk_label = QtGui.QLabel("back LED")
         self.bk_sl = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.bk_sl.setMinimum(0)
         self.bk_sl.setMaximum(255)
-        self.bk_sl.setValue(self.parentWindow.backLEDVal)
+        self.bk_sl.setValue(self.parentWindow.ledBack)
         self.bk_sl.setTickPosition(QtGui.QSlider.TicksBelow)
         self.bk_sl.setTickInterval(1)
 
@@ -62,7 +65,7 @@ class DashboardWidget(QtGui.QWidget):
         self.r_sl = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.r_sl.setMinimum(0)
         self.r_sl.setMaximum(255)
-        self.r_sl.setValue(self.parentWindow.ledRVal)
+        self.r_sl.setValue(self.parentWindow.ledR)
         self.r_sl.setTickPosition(QtGui.QSlider.TicksBelow)
         self.r_sl.setTickInterval(1)
         self.r_sl.valueChanged.connect(self.valuechange)
@@ -71,7 +74,7 @@ class DashboardWidget(QtGui.QWidget):
         self.g_sl = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.g_sl.setMinimum(0)
         self.g_sl.setMaximum(255)
-        self.g_sl.setValue(self.parentWindow.ledGVal)
+        self.g_sl.setValue(self.parentWindow.ledG)
         self.g_sl.setTickPosition(QtGui.QSlider.TicksBelow)
         self.g_sl.setTickInterval(1)
         self.g_sl.valueChanged.connect(self.valuechange)
@@ -80,15 +83,15 @@ class DashboardWidget(QtGui.QWidget):
         self.b_sl = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.b_sl.setMinimum(0)
         self.b_sl.setMaximum(255)
-        self.b_sl.setValue(self.parentWindow.ledBVal)
+        self.b_sl.setValue(self.parentWindow.ledB)
         self.b_sl.setTickPosition(QtGui.QSlider.TicksBelow)
         self.b_sl.setTickInterval(1)
         self.b_sl.valueChanged.connect(self.valuechange)
 
         self.led = LEDWidget([20,20],
-                             [self.parentWindow.ledRVal,
-                              self.parentWindow.ledGVal,
-                              self.parentWindow.ledBVal])
+                             [self.parentWindow.ledR,
+                              self.parentWindow.ledG,
+                              self.parentWindow.ledB])
         
         self.btnUpdate = QtGui.QPushButton("Update")
         self.btnUpdate.clicked.connect(self.updateColor) 
@@ -106,7 +109,10 @@ class DashboardWidget(QtGui.QWidget):
         self.rightBtn = QtGui.QPushButton("Clockwise")
         self.rightBtn.clicked.connect(self.rightRotate)
 
-        self.spheroListWidget = QtGui.QListWidget()
+
+        self.selectedSpheroLabel = QtGui.QLabel("Selected = ")
+        self.spheroListWidget = QtGui.QListWidget(self)
+        self.spheroListWidget.itemClicked.connect(self.handleListClicked)
         self.refreshBtn = QtGui.QPushButton("Refresh")
         self.refreshBtn.clicked.connect(self.parentWindow.refreshDevices)
         btnGridLayout = QtGui.QGridLayout()
@@ -141,26 +147,53 @@ class DashboardWidget(QtGui.QWidget):
         ctrlLayout.addWidget(self.leftBtn)
         ctrlLayout.addWidget(self.rightBtn)
         layout.addLayout(ctrlLayout)
+
+        layout.addWidget(self.selectedSpheroLabel)
         layout.addWidget(self.spheroListWidget)
         layout.addLayout(btnGridLayout)
         self.setLayout(layout)
         self.show()
 
-    def updateColor(self):
-        
-        self.parentWindow.ledRVal = self.r_sl.value()
-        self.parentWindow.ledGVal = self.g_sl.value()
-        self.parentWindow.ledBVal = self.b_sl.value()        
-        self.setLEDColor(self.parentWindow.ledRVal,
-                         self.parentWindow.ledGVal,
-                         self.parentWindow.ledBVal)
-        self.led.setRGB(self.parentWindow.ledRVal,
-                        self.parentWindow.ledGVal,
-                        self.parentWindow.ledBVal)
+    def handleListClicked(self, item):
+        #print "clicked " + str(item.name)
 
-        self.backLEDVal = self.bk_sl.value()
-        self.setBackLED(self.parentWindow.backLEDVal)
+        r = item.rgb[0]
+        g = item.rgb[1]
+        b = item.rgb[2]
+        bk = item.back_led
+        disable = item.disable_stabilization
+        self.bk_sl.setValue(bk)
+        self.r_sl.setValue(r)
+        self.g_sl.setValue(g)
+        self.b_sl.setValue(b)
+        self.disableStabilizationRadioButton.setChecked(disable)
+        self.selectedSpheroLabel.setText("Selected = " + str(item.name))
+        self.spheroListWidget.update()
         self.update()
+
+    def updateColor(self):
+        r = self.r_sl.value()
+        g = self.g_sl.value() 
+        b = self.b_sl.value() 
+        back = self.bk_sl.value()
+        self.updateWidgetColor(r,g,b)
+        self.updateSpheroColor(r,g,b,back)    
+        selected_items = self.spheroListWidget.selectedItems()
+        if len(selected_items) > 0:
+            for item in selected_items:
+                item.rgb[0] = r
+                item.rgb[1] = g
+                item.rgb[2] = b
+                item.back_led = back
+
+    def updateWidgetColor(self,r,g,b):
+        self.led.setRGB(r,g,b)    
+        self.update()
+   
+    def updateSpheroColor(self,r,g,b,back):
+        self.setLEDColor(r,g,b)
+        self.setBackLED(back)
+      
 
     def valuechange(self):
         self.led.setRGB(self.r_sl.value(),
@@ -184,7 +217,6 @@ class DashboardWidget(QtGui.QWidget):
 
     def headingChange(self, int):
         delta_val = self.headingSlider.value() - self.currentHeadingSliderValue 
-        #self.parentWindow.setHeading(delta_val)
         self.currentHeadingSliderValue = self.headingSlider.value()
 
     def handleDisableStabilizationCheck(self):
@@ -215,6 +247,7 @@ class DashboardWidget(QtGui.QWidget):
         selected_items = self.spheroListWidget.selectedItems()
         if len(selected_items) > 0:
             for item in selected_items:
+                item.disable_stabilization = on
                 self.parentWindow.setDisableStabilizationByName(item.name, on)
 
 
@@ -222,24 +255,22 @@ class SpheroDashboardForm(QtGui.QMainWindow):
     
     def __init__(self):
         super(QtGui.QMainWindow, self).__init__()
-        self.resize(600, 300) 
-        
+        self.resize(400, 600) 
+
         self.sphero_dict = {}
+        self.sphero_info = {}
         rospy.init_node('sphero_swarm_dashboard', anonymous=True)
+
+        self.ledR = rospy.get_param('/sphero_swarm/connect_red')
+        self.ledG = rospy.get_param('/sphero_swarm/connect_green')
+        self.ledB = rospy.get_param('/sphero_swarm/connect_blue') 
+        self.ledBack = rospy.get_param('/sphero_swarm/connect_back_led')
+
         self.cmdTurnPub = rospy.Publisher('cmd_turn', SpheroTurn, queue_size=1)     
- 
         self.ledPub = rospy.Publisher('set_color', SpheroColor, queue_size=1)
         self.backLedPub = rospy.Publisher('set_back_led', SpheroBackLed, queue_size=1)   
         self.headingPub = rospy.Publisher('set_heading', SpheroHeading, queue_size=1)
         self.disableStabilizationPub = rospy.Publisher('disable_stabilization', SpheroDisableStabilization, queue_size=1)
-
-        self.ledRVal = 0
-        self.ledGVal = 0
-        self.ledBVal = 0
-        self.backLEDVal = 0
-
-        #self.setLEDColor(self.ledRVal, self.ledGVal, self.ledBVal)
-        #self.setBackLED(self.backLEDVal)
 
         self.initUI()
 
@@ -258,7 +289,8 @@ class SpheroDashboardForm(QtGui.QMainWindow):
 
         for name in self.sphero_dict:
             bt_addr = self.sphero_dict[name]
-            self.dashboard.spheroListWidget.addItem(SpheroListItem( name, bt_addr ))
+            self.sphero_info[name] = [ bt_addr, [self.ledR, self.ledG, self.ledB], self.ledBack, False ]
+            self.dashboard.spheroListWidget.addItem(SpheroListItem( name, bt_addr, [self.ledR, self.ledG, self.ledB], self.ledBack, False ))
         self.update()
 
     def setLEDColorByName(self, name, r, g, b):

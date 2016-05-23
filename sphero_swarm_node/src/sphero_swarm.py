@@ -154,9 +154,27 @@ class SpheroSwarmNode(object):
         self.remove_sphero_srv = rospy.Service('remove_sphero', SpheroInfo, self.remove_sphero)  
 
     def _init_params(self):
-        self.connect_color_red = rospy.get_param('~connect_red',0)
-        self.connect_color_blue = rospy.get_param('~connect_blue',0)
-        self.connect_color_green = rospy.get_param('~connect_green',255)
+        
+        self.connect_color_red = 255
+        if rospy.has_param('/sphero_swarm/connect_red'):
+            self.connect_color_red = rospy.get_param('/sphero_swarm/connect_red')
+        rospy.set_param('/sphero_swarm/connect_red', self.connect_color_red)
+
+        self.connect_color_blue = 255
+        if rospy.has_param('/sphero_swarm/connect_blue'):
+            self.connect_color_blue = rospy.get_param('/sphero_swarm/connect_blue')
+        rospy.set_param('/sphero_swarm/connect_blue', self.connect_color_blue)
+       
+        self.connect_color_green = 255
+        if rospy.has_param('/sphero_swarm/connect_green'):
+            self.connect_color_green = rospy.get_param('/sphero_swarm/connect_green')
+        rospy.set_param('/sphero_swarm/connect_green', self.connect_color_green)
+        
+        self.connect_back_led = 255
+        if rospy.has_param('/sphero_swarm/connect_back_led'):
+            self.connect_back_led = rospy.get_param('/sphero_swarm/connect_back_led',255)
+        rospy.set_param('/sphero_swarm/connect_back_led', self.connect_back_led)
+
         self.cmd_vel_timeout = rospy.Duration(rospy.get_param('~cmd_vel_timeout', 0.6))
         self.diag_update_rate = rospy.Duration(rospy.get_param('~diag_update_rate', 1.0))
 
@@ -229,6 +247,8 @@ class SpheroSwarmNode(object):
 		sphero.robot.add_async_callback(sphero_driver.IDCODE['COLLISION'], sphero.parse_collision)
 		#set the ball to connection color
 		sphero.robot.set_rgb_led(self.connect_color_red,self.connect_color_green,self.connect_color_blue,0,False)
+                #set the ball to connection back led
+                sphero.robot.set_back_led(int(self.connect_back_led),False)
 		#now start receiving packets
 		sphero.robot.start()
 

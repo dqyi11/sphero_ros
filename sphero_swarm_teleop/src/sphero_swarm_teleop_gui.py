@@ -5,6 +5,8 @@ from PyQt4 import QtGui, QtCore
 
 from sphero_swarm_node.msg import SpheroTwist
 
+STEP_LENGTH = 50
+
 class SpheroSwarmTeleopForm(QtGui.QWidget):
     
     def __init__(self):
@@ -65,19 +67,19 @@ class SpheroSwarmTeleopForm(QtGui.QWidget):
            
         if e.key() == QtCore.Qt.Key_U:
             twist = SpheroTwist() 
-            twist.linear.x = -30; twist.linear.y = 30; twist.linear.z = 0
+            twist.linear.x = -STEP_LENGTH; twist.linear.y = STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_I:
             twist = SpheroTwist()  
-            twist.linear.x = 0; twist.linear.y = 30; twist.linear.z = 0
+            twist.linear.x = 0; twist.linear.y = STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0     
         elif e.key() == QtCore.Qt.Key_O:
             twist = SpheroTwist()
-            twist.linear.x = 30; twist.linear.y = 30; twist.linear.z = 0
+            twist.linear.x = STEP_LENGTH; twist.linear.y = STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_J:
             twist = SpheroTwist()
-            twist.linear.x = -30; twist.linear.y = 0; twist.linear.z = 0
+            twist.linear.x = -STEP_LENGTH; twist.linear.y = 0; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_K:
             twist = SpheroTwist()
@@ -85,19 +87,19 @@ class SpheroSwarmTeleopForm(QtGui.QWidget):
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_L:
             twist = SpheroTwist()
-            twist.linear.x = 30; twist.linear.y = 0; twist.linear.z = 0
+            twist.linear.x = STEP_LENGTH; twist.linear.y = 0; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_M:
             twist = SpheroTwist()
-            twist.linear.x = -30; twist.linear.y = -30; twist.linear.z = 0
+            twist.linear.x = -STEP_LENGTH; twist.linear.y = -STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_Comma:
             twist = SpheroTwist()
-            twist.linear.x = 0; twist.linear.y = -30; twist.linear.z = 0
+            twist.linear.x = 0; twist.linear.y = -STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_Period:
             twist = SpheroTwist()
-            twist.linear.x = 30; twist.linear.y = -30; twist.linear.z = 0
+            twist.linear.x = STEP_LENGTH; twist.linear.y = -STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0 
 
         if twist != None:

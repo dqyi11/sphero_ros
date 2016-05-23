@@ -5,7 +5,9 @@ import numpy as np
 
 from sphero_swarm_node.msg import SpheroTwist
 
-class SpheroSwarmRandomMove(Object):
+STEP_LENGTH = 50
+
+class SpheroSwarmRandomMove(object):
     
     def __init__(self):
 
@@ -22,31 +24,31 @@ class SpheroSwarmRandomMove(Object):
         twist = SpheroTwist() 
         twist.name = name
         if move_id == 0:    
-            twist.linear.x = -30; twist.linear.y = 30; twist.linear.z = 0
+            twist.linear.x = -STEP_LENGTH; twist.linear.y = STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif move_id == 1:
-            twist.linear.x = 0; twist.linear.y = 30; twist.linear.z = 0
+            twist.linear.x = 0; twist.linear.y = STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0     
         elif move_id == 2:
-            twist.linear.x = 30; twist.linear.y = 30; twist.linear.z = 0
+            twist.linear.x = STEP_LENGTH; twist.linear.y = STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif move_id == 3:
-            twist.linear.x = -30; twist.linear.y = 0; twist.linear.z = 0
+            twist.linear.x = -STEP_LENGTH; twist.linear.y = 0; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif move_id == 4:
             twist.linear.x = 0; twist.linear.y = 0; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif move_id == 5:
-            twist.linear.x = 30; twist.linear.y = 0; twist.linear.z = 0
+            twist.linear.x = STEP_LENGTH; twist.linear.y = 0; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif move_id == 6:
-            twist.linear.x = -30; twist.linear.y = -30; twist.linear.z = 0
+            twist.linear.x = -STEP_LENGTH; twist.linear.y = -STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif move_id == 7:
-            twist.linear.x = 0; twist.linear.y = -30; twist.linear.z = 0
+            twist.linear.x = 0; twist.linear.y = -STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif move_id == 8:
-            twist.linear.x = 30; twist.linear.y = -30; twist.linear.z = 0
+            twist.linear.x = STEP_LENGTH; twist.linear.y = -STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0 
 
         return twist
