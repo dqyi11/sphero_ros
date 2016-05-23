@@ -36,18 +36,15 @@ class SpheroSwarmRandomMove(object):
             twist.linear.x = -STEP_LENGTH; twist.linear.y = 0; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif move_id == 4:
-            twist.linear.x = 0; twist.linear.y = 0; twist.linear.z = 0
-            twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
-        elif move_id == 5:
             twist.linear.x = STEP_LENGTH; twist.linear.y = 0; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
-        elif move_id == 6:
+        elif move_id == 5:
             twist.linear.x = -STEP_LENGTH; twist.linear.y = -STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
-        elif move_id == 7:
+        elif move_id == 6:
             twist.linear.x = 0; twist.linear.y = -STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
-        elif move_id == 8:
+        elif move_id == 7:
             twist.linear.x = STEP_LENGTH; twist.linear.y = -STEP_LENGTH; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0 
 
@@ -55,7 +52,7 @@ class SpheroSwarmRandomMove(object):
 
     def randomMove(self):
         for name in self.sphero_dict:
-            move_id = np.random.randint(0, 9) 
+            move_id = np.random.randint(0, 8) 
             twist = self.getSpheroTwist(name, move_id)
             self.cmdVelPub.publish(twist)
 
