@@ -176,11 +176,11 @@ class DashboardWidget(QtGui.QWidget):
 
     def leftRotate(self):
         deg = int(self.degTextbox.displayText())
-        self.parentWindow.setHeading(360-deg)
+        self.setHeading(360-deg)
 
     def rightRotate(self):
         deg = int(self.degTextbox.displayText())
-        self.parentWindow.setHeading(15)
+        self.setHeading(15)
 
     def headingChange(self, int):
         delta_val = self.headingSlider.value() - self.currentHeadingSliderValue 
@@ -189,9 +189,9 @@ class DashboardWidget(QtGui.QWidget):
 
     def handleDisableStabilizationCheck(self):
         if self.disableStabilizationRadioButton.isChecked() == True:
-            self.updateDisableStablization(True)
+            self.setDisableStabilization(True)
         else:
-            self.updateDisableStablization(False)
+            self.setDisableStabilization(False)
 
     def setLEDColor(self, r, g, b):
         selected_items = self.spheroListWidget.selectedItems()

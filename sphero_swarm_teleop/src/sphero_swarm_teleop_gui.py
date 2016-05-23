@@ -54,26 +54,30 @@ class SpheroSwarmTeleopForm(QtGui.QWidget):
         self.show()
 
     def keyPressEvent(self, e): 
-        twist = None    
+        twist = None 
+
+        print "key pressed"   
         selected_items = self.spheroListWidget.selectedItems()
         if len(selected_items) == 0:
             return
+
+        print "selected"
            
         if e.key() == QtCore.Qt.Key_U:
             twist = SpheroTwist() 
-            twist.linear.x = -20; twist.linear.y = 20; twist.linear.z = 0
+            twist.linear.x = -30; twist.linear.y = 30; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_I:
             twist = SpheroTwist()  
-            twist.linear.x = 0; twist.linear.y = 20; twist.linear.z = 0
+            twist.linear.x = 0; twist.linear.y = 30; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0     
         elif e.key() == QtCore.Qt.Key_O:
             twist = SpheroTwist()
-            twist.linear.x = 20; twist.linear.y = 20; twist.linear.z = 0
+            twist.linear.x = 30; twist.linear.y = 30; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_J:
             twist = SpheroTwist()
-            twist.linear.x = -20; twist.linear.y = 0; twist.linear.z = 0
+            twist.linear.x = -30; twist.linear.y = 0; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_K:
             twist = SpheroTwist()
@@ -81,23 +85,23 @@ class SpheroSwarmTeleopForm(QtGui.QWidget):
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_L:
             twist = SpheroTwist()
-            twist.linear.x = 20; twist.linear.y = 0; twist.linear.z = 0
+            twist.linear.x = 30; twist.linear.y = 0; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_M:
             twist = SpheroTwist()
-            twist.linear.x = -20; twist.linear.y = -20; twist.linear.z = 0
+            twist.linear.x = -30; twist.linear.y = -30; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_Comma:
             twist = SpheroTwist()
-            twist.linear.x = 0; twist.linear.y = -20; twist.linear.z = 0
+            twist.linear.x = 0; twist.linear.y = -30; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
         elif e.key() == QtCore.Qt.Key_Period:
             twist = SpheroTwist()
-            twist.linear.x = 20; twist.linear.y = -20; twist.linear.z = 0
+            twist.linear.x = 30; twist.linear.y = -30; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0 
 
         if twist != None:
-            twist.name = selected_items[0]
+            twist.name = str(selected_items[0].text())
             self.cmdVelPub.publish(twist)
 
     def cmdVelCallback(self, msg):
