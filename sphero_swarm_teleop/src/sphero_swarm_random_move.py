@@ -13,6 +13,9 @@ class SpheroSwarmRandomMove(Object):
         self.cmdVelPub = rospy.Publisher('cmd_vel', SpheroTwist, queue_size=1)
 
         self.sphero_dict = rospy.get_param('/sphero_swarm/connected')
+        print "connected:"
+        for name in self.sphero_dict:
+            print name
 
     def getSpheroTwist(self, name, move_id):
 
