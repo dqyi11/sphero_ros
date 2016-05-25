@@ -25,6 +25,7 @@ class SpheroAgent(object):
         self.robot_bt_addr = bt_addr
         self.parent = parent
         self.robot = sphero_driver.Sphero(self.robot_name, self.robot_bt_addr, lock)
+        self.robot.setDaemon(True)
     
         self.imu = SpheroImu()
         self.imu.name = name
@@ -271,6 +272,8 @@ class SpheroSwarmNode(object):
             r.sleep()
                     
     def stop(self):    
+        print "stop sphero swarm"
+  
         #tell the ball to stop moving before quiting
         for name in self.sphero_dict:
             sphero = self.sphero_dict[name]
@@ -281,6 +284,11 @@ class SpheroSwarmNode(object):
             sphero = self.sphero_dict[name]
             sphero.is_connected = sphero.robot.disconnect()
             sphero.robot.join()
+            del self.sphero_dict[name]
+            del self.team_info[name]
+            del self.sphero_connected[name]
+        rospy.set_param('/sphero_swarm/team', self.team_info)
+        rospy.set_param('/sphero_swarm/connected', self.sphero_connected)
 
     def publish_diagnostics(self, time):
         diag = DiagnosticArray()
