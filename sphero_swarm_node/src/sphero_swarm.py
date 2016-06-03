@@ -135,6 +135,8 @@ class SpheroSwarmNode(object):
         
         self.last_diagnostics_time = rospy.Time.now()
         self.mutual_lock = threading.Lock()
+
+        rospy.delete_param('/sphero_swarm/team')
         
     def _init_pubsub(self):
         self.odom_pub = rospy.Publisher('odom', SpheroOdometry)
@@ -287,7 +289,8 @@ class SpheroSwarmNode(object):
             del self.sphero_dict[name]
             del self.team_info[name]
             del self.sphero_connected[name]
-        rospy.set_param('/sphero_swarm/team', self.team_info)
+        #rospy.set_param('/sphero_swarm/team', self.team_info)
+        rospy.delete_param('/sphero_swarm/team')
         rospy.set_param('/sphero_swarm/connected', self.sphero_connected)
 
     def publish_diagnostics(self, time):
